@@ -66,6 +66,18 @@ export function SiteNavbar() {
           <Link href="/submit/action" className="text-sm hover:underline" style={{ color: "#111827" }}>
             Submit Action
           </Link>
+          <Link href="/notifications" className="text-sm hover:underline" style={{ color: "#111827" }}>
+            Notifications
+          </Link>
+          <Link href="/history" className="text-sm hover:underline" style={{ color: "#111827" }}>
+            History
+          </Link>
+          <Link href="/contact" className="text-sm hover:underline" style={{ color: "#111827" }}>
+            Contact
+          </Link>
+          <Link href="/profile" className="text-sm hover:underline" style={{ color: "#111827" }}>
+            Profile
+          </Link>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm hover:underline" style={{ color: "#111827" }}>
               Login
@@ -107,6 +119,18 @@ export function SiteNavbar() {
             </Link>
             <Link href="/submit/action" className="py-2" style={{ color: "#111827" }} onClick={() => setOpen(false)}>
               Submit Action
+            </Link>
+            <Link href="/notifications" className="py-2" style={{ color: "#111827" }} onClick={() => setOpen(false)}>
+              Notifications
+            </Link>
+            <Link href="/history" className="py-2" style={{ color: "#111827" }} onClick={() => setOpen(false)}>
+              History
+            </Link>
+            <Link href="/contact" className="py-2" style={{ color: "#111827" }} onClick={() => setOpen(false)}>
+              Contact
+            </Link>
+            <Link href="/profile" className="py-2" style={{ color: "#111827" }} onClick={() => setOpen(false)}>
+              Profile
             </Link>
             <Link href="/login" className="py-2" style={{ color: "#111827" }} onClick={() => setOpen(false)}>
               Login
