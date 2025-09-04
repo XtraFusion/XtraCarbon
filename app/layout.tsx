@@ -3,7 +3,7 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
-
+import {ClerkProvider} from "@clerk/nextjs"
 export const metadata: Metadata = {
   title: 'v0 App',
   description: 'Created with v0',
@@ -17,10 +17,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <ClerkProvider>
+
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         {children}
         <Analytics />
       </body>
+      </ClerkProvider>
     </html>
   )
 }

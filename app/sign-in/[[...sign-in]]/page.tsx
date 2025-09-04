@@ -57,7 +57,6 @@ export default function LoginPage() {
                 }
               }
             }}
-            redirectUrl="/user/dashboard"
             signUpUrl="/signup"
           />
         </div>
