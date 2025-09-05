@@ -1,16 +1,18 @@
 "use client"
 
 import type React from "react"
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import Draggable from "react-draggable"
-import { useRef } from "react"
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
+  const desktopToggleRef = useRef<HTMLDivElement>(null)
+  const draggingRef = useRef(false)
 
   const sections = useMemo(
     () => [
@@ -34,55 +36,66 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   // Handle mobile menu body scroll
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-    
+    document.body.style.overflow = open ? "hidden" : "unset"
     return () => {
-      document.body.style.overflow = 'unset'
+      document.body.style.overflow = "unset"
     }
   }, [open])
 
-  const desktopToggleRef = useRef(null);
-  const draggingRef = useRef(false);
+  // Reset icon position when sidebar is opened
+  useEffect(() => {
+    if (sidebarOpen) setIconPosition({ x: 0, y: 0 })
+  }, [sidebarOpen])
+
   return (
-  <div className="flex min-h-screen bg-[#F3F4F6] text-gray-900">
-      {/* Desktop Sidebar Toggle - Fixed position, draggable */}
-      <Draggable nodeRef={desktopToggleRef}>
-        <div ref={desktopToggleRef} className="hidden md:block fixed top-4 left-4 z-50 cursor-move bg-[#F3F4F6]">
+    <div className="flex min-h-screen bg-[#F3F4F6] text-gray-900">
+      {/* Desktop Sidebar Toggle - Fixed position, draggable only when closed */}
+      <Draggable
+        nodeRef={desktopToggleRef}
+        position={sidebarOpen ? { x: 0, y: 0 } : iconPosition}
+  onStart={() => sidebarOpen ? false : undefined}
+        onStop={(_, data) => {
+          if (!sidebarOpen) setIconPosition({ x: data.x, y: data.y })
+        }}
+        disabled={sidebarOpen}
+        key={sidebarOpen ? "sidebar-open" : "sidebar-closed"}
+      >
+        <div
+          ref={desktopToggleRef}
+          className="hidden md:block fixed z-50 cursor-move bg-[#F3F4F6]"
+          style={{ top: 16, left: 16 }}
+        >
           <button
             type="button"
-            className={`flex flex-col justify-center items-center w-10 h-10 rounded-lg p-2 bg-white border border-gray-200 hover:bg-gray-50 transition-colors${sidebarOpen ? ' shadow-lg' : ''}`}
+            className={`flex flex-col justify-center items-center w-11 h-11 rounded-lg p-2 bg-[#F3F4F6] hover:bg-gray-100 transition-colors${sidebarOpen ? " shadow-lg" : ""}`}
             aria-expanded={sidebarOpen}
             aria-label="Toggle sidebar"
             onPointerDown={() => {
-              draggingRef.current = false;
+              draggingRef.current = false
             }}
             onPointerMove={() => {
-              draggingRef.current = true;
+              draggingRef.current = true
             }}
             onPointerUp={() => {
               if (!draggingRef.current) {
-                setSidebarOpen(v => !v);
+                setSidebarOpen((v) => !v)
               }
-              draggingRef.current = false;
+              draggingRef.current = false
             }}
           >
             <span
-              className={`block w-6 h-0.5 bg-emerald-600 transition-all duration-300 ${
+              className={`block w-7 h-0.5 bg-emerald-600 transition-all duration-300 ${
                 sidebarOpen ? "rotate-45 translate-y-0.5" : "mb-1"
               }`}
             ></span>
             <span
-              className={`block w-6 h-0.5 bg-emerald-600 transition-all duration-300 ${
-                sidebarOpen ? "opacity-0 scale-0" : "mb-1"
+              className={`block w-7 h-0.5 bg-emerald-600 transition-all duration-300 ${
+                sidebarOpen ? "opacity-0 scale-0" : "mb-1"}
               }`}
             ></span>
             <span
-              className={`block w-6 h-0.5 bg-emerald-600 transition-all duration-300 ${
-                sidebarOpen ? "-rotate-45 -translate-y-0.5" : ""
+              className={`block w-7 h-0.5 bg-emerald-600 transition-all duration-300 ${
+                sidebarOpen ? "-rotate-45 -translate-y-0.5" : ""}
               }`}
             ></span>
           </button>
@@ -97,7 +110,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
-              className={`flex flex-col justify-center items-center w-8 h-8 rounded-md p-1 bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-colors${open ? ' shadow-lg' : ''}`}
+              className={`flex flex-col justify-center items-center w-8 h-8 rounded-md p-1 bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-colors${open ? " shadow-lg" : ""}`}
               aria-expanded={open}
               aria-controls="mobile-sidebar"
               aria-label="Toggle menu"
@@ -112,21 +125,19 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               ></span>
               <span
                 className={`block w-5 h-0.5 bg-emerald-600 transition-all duration-300 ${
-                  open ? "-rotate-45 -translate-y-0.5" : ""
+                  open ? "-rotate-45 -translate-y-0.5" : ""}
                 }`}
               ></span>
             </button>
           </div>
-          
           {/* Mobile Menu Dropdown */}
           {open && (
             <>
               {/* Mobile backdrop */}
-              <div 
+              <div
                 className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
                 onClick={() => setOpen(false)}
               />
-              
               <nav id="mobile-sidebar" className="relative z-30 mt-3 bg-white rounded-lg shadow-lg border border-gray-200 p-3">
                 <ul className="grid grid-cols-1 gap-2">
                   {sections.map((s) => {
@@ -165,7 +176,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div className="mb-6">
             <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Navigation</h2>
           </div>
-          
           <nav>
             <ul className="space-y-1">
               {sections.map((section) => {
@@ -188,7 +198,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               })}
             </ul>
           </nav>
-
           {/* Status section */}
           <div className="mt-8 pt-6 border-t border-gray-200">
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
@@ -205,11 +214,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content - Full Width */}
-        <main className={`flex-1 w-full min-h-screen transition-all duration-300 ease-in-out ${
+      <main
+        className={`flex-1 w-full min-h-screen transition-all duration-300 ease-in-out ${
           sidebarOpen ? "md:ml-64" : "md:ml-0"
-        }`}>
-          {children}
-        </main>
+        }`}
+      >
+        {children}
+      </main>
     </div>
   )
 }
