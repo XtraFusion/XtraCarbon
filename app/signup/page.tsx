@@ -1,11 +1,11 @@
 import Link from "next/link"
 import { SignUp } from "@clerk/nextjs"
-import { SiteNavbar } from "@/components/site-navbar"
+// ...existing code...
 
 export default function SignupPage() {
   return (
     <main className="min-h-dvh" style={{ backgroundColor: "#F3F4F6", color: "#111827" }}>
-      <SiteNavbar />
+// ...existing code...
       <section className="mx-auto max-w-md px-4 py-10">
         <div className="flex justify-center">
           <SignUp 

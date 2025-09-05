@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { SiteNavbar } from "@/components/site-navbar"
+// ...existing code...
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 export default function ForgotPasswordPage() {
   return (
     <main className="min-h-dvh" style={{ backgroundColor: "#F3F4F6", color: "#111827" }}>
-      <SiteNavbar />
+// ...existing code...
       <section className="mx-auto max-w-md px-4 py-10">
         <Card style={{ backgroundColor: "#F3F4F6", border: "1px solid rgba(17,24,39,0.15)" }}>
           <CardHeader>

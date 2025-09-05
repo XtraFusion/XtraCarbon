@@ -1,4 +1,4 @@
-import { SiteNavbar } from "@/components/site-navbar"
+// ...existing code...
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -13,7 +13,7 @@ const rows = [
 export default function HistoryPage() {
   return (
     <main className="min-h-dvh" style={{ backgroundColor: "#F3F4F6", color: "#111827" }}>
-      <SiteNavbar />
+// ...existing code...
       <section className="mx-auto max-w-6xl px-4 py-10">
         <header className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">History</h1>

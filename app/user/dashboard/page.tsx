@@ -1,6 +1,6 @@
 "use client"
 
-import { SiteNavbar } from "@/components/site-navbar"
+// ...existing code...
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid } from "recharts"
 
 type DataPoint = { month: string; co2: number }
@@ -17,7 +17,7 @@ const co2Data: DataPoint[] = [
 export default function UserDashboardPage() {
   return (
     <main className="min-h-dvh" style={{ backgroundColor: "#F3F4F6", color: "#111827" }}>
-      <SiteNavbar />
+// ...existing code...
       <section className="mx-auto max-w-6xl px-4 py-8">
         <header className="mb-6">
           <h1 className="text-2xl font-semibold tracking-tight">User Dashboard</h1>
