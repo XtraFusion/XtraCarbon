@@ -1,8 +1,9 @@
  
 import { Hero } from "@/components/hero"
 import { Features } from "@/components/features"
-
+import { saveUserToDB } from "./action/saveUser"
 export default function HomePage() {
+  saveUserToDB();
   return (
     <main className="min-h-dvh" style={{ backgroundColor: "#F3F4F6", color: "#111827" }}>
  

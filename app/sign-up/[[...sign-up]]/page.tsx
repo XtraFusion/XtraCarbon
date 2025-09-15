@@ -1,39 +1,29 @@
 "use client"
+import { SignUp, useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { User, Building2, Shield, ChevronRight, Check, Sparkles, Eye, EyeOff, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { User, Building2, Shield, ChevronRight, Check, Sparkles } from "lucide-react";
+import { useUserSync } from "@/lib/hooks/useUserSync";
 
 export default function SignupPage() {
+  const { user, isSignedIn } = useUser();
+  const { syncing } = useUserSync();
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState("");
   const [showSignUp, setShowSignUp] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    firstName: "",
-    lastName: "",
-    organizationName: "",
-    contactPhone: ""
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  useEffect(() => {
+    if (isSignedIn && user && !syncing) {
+      const role = user.publicMetadata.role || selectedRole;
+      if (role === "org") {
+        router.push("/org/dashboard");
+      } else if (role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/user/dashboard");
+      }
+    }
+  }, [isSignedIn, user, selectedRole, router, syncing]);
 
   const roles = [
     {
@@ -65,59 +55,6 @@ export default function SignupPage() {
   const handleRoleSelect = (role:any) => {
     setSelectedRole(role);
     setShowSignUp(true);
-  };
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-
-    // Validate passwords match
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
-      return;
-    }
-
-    // Validate password length
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          role: selectedRole,
-          confirmPassword: undefined // Don't send confirmPassword to API
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Redirect based on user role
-        if (selectedRole === "org") {
-          router.push("/org/dashboard");
-        } else if (selectedRole === "admin") {
-          router.push("/admin");
-        } else {
-          router.push("/user/dashboard");
-        }
-      } else {
-        setError(data.error || "Signup failed");
-      }
-    } catch (error) {
-      setError("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   if (showSignUp) {
@@ -161,172 +98,52 @@ export default function SignupPage() {
           </div>
 
           <div className="flex justify-center">
-            <Card className="w-full max-w-md shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-              <CardHeader className="space-y-1 text-center">
-                <CardTitle className="text-2xl font-bold text-gray-900">
-                  Create your account
-                </CardTitle>
-                <CardDescription className="text-gray-600">
-                  Sign up as {roles.find(r => r.id === selectedRole)?.title}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSignup} className="space-y-4">
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        placeholder="John"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        className="h-11"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        placeholder="Doe"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        className="h-11"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="john@example.com"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                      className="h-11"
-                    />
-                  </div>
-                  
-                  {selectedRole === "org" && (
-                    <div className="space-y-2">
-                      <Label htmlFor="organizationName">Organization Name</Label>
-                      <Input
-                        id="organizationName"
-                        name="organizationName"
-                        placeholder="Your Organization"
-                        value={formData.organizationName}
-                        onChange={handleInputChange}
-                        className="h-11"
-                      />
-                    </div>
-                  )}
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="contactPhone">Phone Number (Optional)</Label>
-                    <Input
-                      id="contactPhone"
-                      name="contactPhone"
-                      type="tel"
-                      placeholder="+1 (555) 123-4567"
-                      value={formData.contactPhone}
-                      onChange={handleInputChange}
-                      className="h-11"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        name="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Create a password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        required
-                        className="h-11 pr-10"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="Confirm your password"
-                        value={formData.confirmPassword}
-                        onChange={handleInputChange}
-                        required
-                        className="h-11 pr-10"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full h-11 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating account...
-                      </>
-                    ) : (
-                      "Create account"
-                    )}
-                  </Button>
-                </form>
-
-                <div className="mt-6 text-center">
-                  <p className="text-sm text-gray-600">
-                    Already have an account?{" "}
-                    <a
-                      href="/sign-in"
-                      className="text-green-600 font-medium hover:text-green-700 transition-colors"
-                    >
-                      Sign in
-                    </a>
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <SignUp
+            
+              onSuccess={() => {
+                // Handle successful sign-up
+              }}
+              appearance={{
+                elements: {
+                  formButtonPrimary: { 
+                    backgroundColor: "#059669", 
+                    "&:hover": { backgroundColor: "#047857" } 
+                  },
+                  card: { 
+                    backgroundColor: "#FFFFFF", 
+                    border: "1px solid #E5E7EB", 
+                    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
+                    borderRadius: "0.75rem"
+                  },
+                  headerTitle: { color: "#111827", fontSize: "1.5rem", fontWeight: "700" },
+                  headerSubtitle: { color: "#6B7280" },
+                  socialButtonsBlockButton: {
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #E5E7EB",
+                    color: "#374151",
+                    "&:hover": { backgroundColor: "#F9FAFB" },
+                  },
+                  socialButtonsBlockButtonText: { color: "#374151" },
+                  formFieldInput: { 
+                    backgroundColor: "#FFFFFF", 
+                    color: "#111827", 
+                    borderColor: "#E5E7EB",
+                    "&:focus": { borderColor: "#059669", boxShadow: "0 0 0 3px rgba(5, 150, 105, 0.1)" }
+                  },
+                  formFieldLabel: { color: "#374151", fontWeight: "500" },
+                  footerActionLink: { color: "#059669", fontWeight: "500" },
+                  identityPreviewText: { color: "#111827" },
+                  formResendCodeLink: { color: "#059669" },
+                },
+              }}
+              redirectUrl={`/${selectedRole === "org" ? "org-dashboard" : selectedRole === "admin" ? "admin" : "user/dashboard"}`}
+              signInUrl="/login"
+              unsafeMetadata={{
+                role: selectedRole,
+                organizationName: selectedRole === 'org' ? '' : undefined
+              }}
+              afterSignUpUrl="/api/users/sync"
+            />
           </div>
         </section>
       </main>

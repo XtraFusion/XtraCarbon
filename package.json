@@ -66,6 +66,7 @@
     "react-dom": "^19",
     "react-draggable": "^4.5.0",
     "react-hook-form": "^7.60.0",
+    "react-is": "^19.1.1",
     "react-resizable-panels": "^2.1.7",
     "recharts": "latest",
     "sonner": "^1.7.4",

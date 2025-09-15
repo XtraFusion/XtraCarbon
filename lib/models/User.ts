@@ -2,9 +2,8 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 // User interface extending Document
 export interface IUser extends Document {
-  clerkId?: string; // Made optional for basic auth
+  clerkId: string;
   email: string;
-  password: string; // Added for basic auth
   firstName?: string;
   lastName?: string;
   role: 'user' | 'org' | 'admin';
@@ -27,9 +26,8 @@ export interface IUser extends Document {
 const UserSchema = new Schema<IUser>({
   clerkId: {
     type: String,
-    required: false, // Made optional for basic auth
+    required: true,
     unique: true,
-    sparse: true, // Allows multiple null values
     index: true
   },
   email: {
@@ -38,11 +36,6 @@ const UserSchema = new Schema<IUser>({
     unique: true,
     lowercase: true,
     trim: true
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6
   },
   firstName: {
     type: String,
