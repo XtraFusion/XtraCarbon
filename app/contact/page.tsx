@@ -1,4 +1,4 @@
-// ...existing code...
+ 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 export default function ContactPage() {
   return (
     <main className="min-h-dvh" style={{ backgroundColor: "#F3F4F6", color: "#111827" }}>
-// ...existing code...
+ 
       <section className="mx-auto max-w-6xl px-4 py-10">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Card style={{ backgroundColor: "#F3F4F6", border: "1px solid rgba(17,24,39,0.15)" }}>

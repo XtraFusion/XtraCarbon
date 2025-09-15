@@ -1,4 +1,4 @@
-// ...existing code...
+ 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -17,7 +17,7 @@ const notifications = [
 export default function NotificationsPage() {
   return (
     <main className="min-h-dvh" style={{ backgroundColor: "#F3F4F6", color: "#111827" }}>
-// ...existing code...
+ 
       <section className="mx-auto max-w-3xl px-4 py-10">
         <header className="mb-4 flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Notifications</h1>

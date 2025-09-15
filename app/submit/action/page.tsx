@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-// ...existing code...
+ 
 import { useState } from "react"
 
 export default function SubmitActionPage() {
@@ -19,7 +19,7 @@ export default function SubmitActionPage() {
 
   return (
     <main className="min-h-dvh" style={{ backgroundColor: "#F3F4F6", color: "#111827" }}>
-// ...existing code...
+ 
       <section className="mx-auto max-w-3xl px-4 py-8">
         <header className="mb-6">
           <h1 className="text-2xl font-semibold tracking-tight">Submit Action</h1>

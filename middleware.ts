@@ -1,15 +1,69 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextRequest, NextResponse } from "next/server";
+import { verifyToken } from "@/lib/auth";
 
-const isPublicRoute = createRouteMatcher([
-  '/sign-in(.*)',
-  '/sign-up(.*)'
-])
+// Public routes that don't require authentication
+const publicRoutes = [
+  '/sign-in',
+  '/sign-up',
+  '/login',
+  '/api/auth/login',
+  '/api/auth/signup',
+  '/api/auth/logout',
+  '/',
+  '/contact',
+  '/forgot-password'
+];
 
-export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
-    await auth.protect()
+// Routes that require specific roles
+const orgRoutes = ['/org/dashboard'];
+const adminRoutes = ['/admin'];
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Skip middleware for public routes
+  if (publicRoutes.some(route => pathname.startsWith(route))) {
+    return NextResponse.next();
   }
-})
+
+  // Skip middleware for static files and API routes (except auth)
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api/') ||
+    pathname.includes('.') ||
+    pathname.startsWith('/favicon')
+  ) {
+    return NextResponse.next();
+  }
+
+  try {
+    // Verify authentication token
+    const user = await verifyToken(request);
+    
+    if (!user) {
+      // Redirect to login if not authenticated
+      return NextResponse.redirect(new URL('/sign-in', request.url));
+    }
+
+    // Check role-based access
+    if (orgRoutes.some(route => pathname.startsWith(route))) {
+      if (user.role !== 'org') {
+        return NextResponse.redirect(new URL('/unauthorized', request.url));
+      }
+    }
+
+    if (adminRoutes.some(route => pathname.startsWith(route))) {
+      if (user.role !== 'admin') {
+        return NextResponse.redirect(new URL('/unauthorized', request.url));
+      }
+    }
+
+    return NextResponse.next();
+  } catch (error) {
+    console.error('Middleware error:', error);
+    return NextResponse.redirect(new URL('/sign-in', request.url));
+  }
+}
 
 export const config = {
   matcher: [
@@ -18,4 +72,4 @@ export const config = {
     // Always run for API routes
     '/(api|trpc)(.*)',
   ],
-}
+};

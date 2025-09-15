@@ -1,4 +1,4 @@
-// ...existing code...
+ 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 export default function ProfilePage() {
   return (
     <main className="min-h-dvh" style={{ backgroundColor: "#F3F4F6", color: "#111827" }}>
-// ...existing code...
+ 
       <section className="mx-auto max-w-3xl px-4 py-10">
         <Card style={{ backgroundColor: "#F3F4F6", border: "1px solid rgba(17,24,39,0.15)" }}>
           <CardHeader className="flex flex-col items-center gap-2">

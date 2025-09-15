@@ -1,11 +1,11 @@
-// ...existing code...
+ 
 import { Hero } from "@/components/hero"
 import { Features } from "@/components/features"
 
 export default function HomePage() {
   return (
     <main className="min-h-dvh" style={{ backgroundColor: "#F3F4F6", color: "#111827" }}>
-// ...existing code...
+ 
       <Hero />
       <Features />
       <footer

@@ -1,18 +1,20 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useMemo, useEffect, useRef } from "react"
-import { usePathname } from "next/navigation"
-import Link from "next/link"
-import Draggable from "react-draggable"
+import type React from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import Draggable from "react-draggable";
+import { Button } from "./ui/button";
+import { SignOutButton } from "@clerk/nextjs";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const [open, setOpen] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 })
-  const desktopToggleRef = useRef<HTMLDivElement>(null)
-  const draggingRef = useRef(false)
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 });
+  const desktopToggleRef = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef(false);
 
   const sections = useMemo(
     () => [
@@ -26,26 +28,26 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       { href: "/login", label: "Login" },
       { href: "/signup", label: "Sign Up" },
     ],
-    [],
-  )
+    []
+  );
 
   // Close mobile menu on route change
   useEffect(() => {
-    setOpen(false)
-  }, [pathname])
+    setOpen(false);
+  }, [pathname]);
 
   // Handle mobile menu body scroll
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "unset"
+    document.body.style.overflow = open ? "hidden" : "unset";
     return () => {
-      document.body.style.overflow = "unset"
-    }
-  }, [open])
+      document.body.style.overflow = "unset";
+    };
+  }, [open]);
 
   // Reset icon position when sidebar is opened
   useEffect(() => {
-    if (sidebarOpen) setIconPosition({ x: 0, y: 0 })
-  }, [sidebarOpen])
+    if (sidebarOpen) setIconPosition({ x: 0, y: 0 });
+  }, [sidebarOpen]);
 
   return (
     <div className="flex min-h-screen bg-[#F3F4F6] text-gray-900">
@@ -53,9 +55,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <Draggable
         nodeRef={desktopToggleRef}
         position={sidebarOpen ? { x: 0, y: 0 } : iconPosition}
-  onStart={() => sidebarOpen ? false : undefined}
+        onStart={() => (sidebarOpen ? false : undefined)}
         onStop={(_, data) => {
-          if (!sidebarOpen) setIconPosition({ x: data.x, y: data.y })
+          if (!sidebarOpen) setIconPosition({ x: data.x, y: data.y });
         }}
         disabled={sidebarOpen}
         key={sidebarOpen ? "sidebar-open" : "sidebar-closed"}
@@ -67,20 +69,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         >
           <button
             type="button"
-            className={`flex flex-col justify-center items-center w-11 h-11 rounded-lg p-2 bg-[#F3F4F6] hover:bg-gray-100 transition-colors${sidebarOpen ? " shadow-lg" : ""}`}
+            className={`flex flex-col justify-center items-center w-11 h-11 rounded-lg p-2 bg-[#F3F4F6] hover:bg-gray-100 transition-colors${
+              sidebarOpen ? " shadow-lg" : ""
+            }`}
             aria-expanded={sidebarOpen}
             aria-label="Toggle sidebar"
             onPointerDown={() => {
-              draggingRef.current = false
+              draggingRef.current = false;
             }}
             onPointerMove={() => {
-              draggingRef.current = true
+              draggingRef.current = true;
             }}
             onPointerUp={() => {
               if (!draggingRef.current) {
-                setSidebarOpen((v) => !v)
+                setSidebarOpen((v) => !v);
               }
-              draggingRef.current = false
+              draggingRef.current = false;
             }}
           >
             <span
@@ -90,12 +94,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             ></span>
             <span
               className={`block w-7 h-0.5 bg-emerald-600 transition-all duration-300 ${
-                sidebarOpen ? "opacity-0 scale-0" : "mb-1"}
+                sidebarOpen ? "opacity-0 scale-0" : "mb-1"
+              }
               }`}
             ></span>
             <span
               className={`block w-7 h-0.5 bg-emerald-600 transition-all duration-300 ${
-                sidebarOpen ? "-rotate-45 -translate-y-0.5" : ""}
+                sidebarOpen ? "-rotate-45 -translate-y-0.5" : ""
+              }
               }`}
             ></span>
           </button>
@@ -110,7 +116,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
-              className={`flex flex-col justify-center items-center w-8 h-8 rounded-md p-1 bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-colors${open ? " shadow-lg" : ""}`}
+              className={`flex flex-col justify-center items-center w-8 h-8 rounded-md p-1 bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-colors${
+                open ? " shadow-lg" : ""
+              }`}
               aria-expanded={open}
               aria-controls="mobile-sidebar"
               aria-label="Toggle menu"
@@ -121,11 +129,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 }`}
               ></span>
               <span
-                className={`block w-5 h-0.5 bg-emerald-600 transition-all duration-300 ${open ? "opacity-0 scale-0" : "mb-1"}`}
+                className={`block w-5 h-0.5 bg-emerald-600 transition-all duration-300 ${
+                  open ? "opacity-0 scale-0" : "mb-1"
+                }`}
               ></span>
               <span
                 className={`block w-5 h-0.5 bg-emerald-600 transition-all duration-300 ${
-                  open ? "-rotate-45 -translate-y-0.5" : ""}
+                  open ? "-rotate-45 -translate-y-0.5" : ""
+                }
                 }`}
               ></span>
             </button>
@@ -138,10 +149,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
                 onClick={() => setOpen(false)}
               />
-              <nav id="mobile-sidebar" className="relative z-30 mt-3 bg-white rounded-lg shadow-lg border border-gray-200 p-3">
+              <nav
+                id="mobile-sidebar"
+                className="relative z-30 mt-3 bg-white rounded-lg shadow-lg border border-gray-200 p-3"
+              >
                 <ul className="grid grid-cols-1 gap-2">
                   {sections.map((s) => {
-                    const active = pathname === s.href || (s.href !== "/" && pathname?.startsWith(s.href))
+                    const active =
+                      pathname === s.href ||
+                      (s.href !== "/" && pathname?.startsWith(s.href));
                     return (
                       <li key={s.href}>
                         <Link
@@ -157,8 +173,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                           {s.label}
                         </Link>
                       </li>
-                    )
+                    );
                   })}
+                </ul>
+                <ul>
+                  <SignOutButton>Logout</SignOutButton>
                 </ul>
               </nav>
             </>
@@ -174,12 +193,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       >
         <div className="p-6 pt-20 w-64">
           <div className="mb-6">
-            <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Navigation</h2>
+            <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
+              Navigation
+            </h2>
           </div>
           <nav>
             <ul className="space-y-1">
               {sections.map((section) => {
-                const active = pathname === section.href || (section.href !== "/" && pathname?.startsWith(section.href))
+                const active =
+                  pathname === section.href ||
+                  (section.href !== "/" && pathname?.startsWith(section.href));
                 return (
                   <li key={section.href}>
                     <Link
@@ -194,8 +217,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                       {section.label}
                     </Link>
                   </li>
-                )
+                );
               })}
+            </ul>
+            <ul>
+                                <SignOutButton>Logout</SignOutButton>
+
             </ul>
           </nav>
           {/* Status section */}
@@ -222,5 +249,5 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
     </div>
-  )
+  );
 }
