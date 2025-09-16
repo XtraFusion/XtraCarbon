@@ -174,9 +174,9 @@ export const NGOFormSubmissionSchema = z.object({
   contactEmail: z.string().email(),
   contactPhone: z.string().min(1).max(20),
   projectLocation: z.string().min(1).max(500),
-  gpsLatitude: z.string().regex(/^-?([1-8]?[0-9](\.[0-9]+)?|90(\.0+)?)$/),
-  gpsLongitude: z.string().regex(/^-?((1[0-7][0-9])|([1-9]?[0-9]))(\.[0-9]+)?$/),
-  landArea: z.string().regex(/^\d+(\.\d+)?$/),
+  gpsLatitude: z.number(),
+  gpsLongitude: z.number(),
+  landArea: z.number(),
   landAreaUnit: z.enum(['hectares', 'acres']),
   
   // Project Type

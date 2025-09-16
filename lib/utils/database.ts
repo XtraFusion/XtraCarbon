@@ -14,6 +14,7 @@ import {
 // Database connection helper
 export async function ensureDBConnection() {
   try {
+    // console.log(process.env.MONGODB_URIW)
     await connectDB();
     return true;
   } catch (error) {
@@ -52,7 +53,9 @@ export class UserService {
 
 // NGO Project Submission operations
 export class NGOProjectService {
-  static async createSubmission(formData: NGOFormSubmissionData, submittedBy: string) {
+  static async createSubmission(data: any, submittedBy: string) {
+    const {data:formData} =data;
+    console.log("Creating submission with data:", formData, "by user:", submittedBy);
     await ensureDBConnection();
     
     // Transform form data to match schema
@@ -76,7 +79,7 @@ export class NGOProjectService {
         startDate: new Date(formData.monitoringStartDate),
         endDate: new Date(formData.monitoringEndDate),
         collectionMethod: formData.dataCollectionMethod,
-        dataSources: formData.dataSources.split(',').map(s => s.trim()),
+        dataSources: formData.dataSources,
         frequency: formData.collectionFrequency
       },
       submittedBy,

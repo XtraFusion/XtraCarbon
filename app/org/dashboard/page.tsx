@@ -28,12 +28,13 @@ export default function OrgDashboardPage() {
               Register a new sustainability project for review.
             </p>
             <a
-              href="/submit/project"
+              href="/submit/project/ngo"
               className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium"
               style={{ backgroundColor: "#059669", color: "#F3F4F6" }}
             >
               New Project
             </a>
+            
           </div>
 
           {/* Verification Status */}

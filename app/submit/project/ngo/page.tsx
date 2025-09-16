@@ -2,7 +2,8 @@
 
 import type React from "react"
 import { useState } from "react"
-
+import axios from "axios"
+import { useRouter } from "next/navigation"
 interface NGOFormData {
   // Project/Organization Details
   projectName: string
@@ -46,6 +47,7 @@ interface NGOFormData {
 }
 
 export default function NGOProjectSubmissionPage() {
+  const router =  useRouter();
   const [submitting, setSubmitting] = useState(false)
   const [currentSection, setCurrentSection] = useState(0)
   const [formData, setFormData] = useState<NGOFormData>({
@@ -108,14 +110,17 @@ export default function NGOProjectSubmissionPage() {
     setFormData(prev => ({ ...prev, [name]: file }))
   }
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  // setSubmitting(false)
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setSubmitting(true)
+    setSubmitting(false)
+    const data = await axios.post("/api/projects",{data:formData})
     console.log("NGO Form Data:", formData)
-    setTimeout(() => {
-      alert("Project submitted for verification! You will be notified once verification is complete.")
-      setSubmitting(false)
-    }, 2000)
+    // setTimeout(() => {
+    //   alert("Project submitted for verification! You will be notified once verification is complete.")
+    //   setSubmitting(false)
+    // }, 2000)
+    router.push("/org/dashboard")
   }
 
   function nextSection() {
@@ -873,7 +878,7 @@ export default function NGOProjectSubmissionPage() {
             ) : (
               <button
                 type="submit"
-                disabled={submitting}
+                // di5sabled={submitting}
                 className="px-8 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? "Submitting..." : "Submit for Verification"}

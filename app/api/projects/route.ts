@@ -53,10 +53,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Validate the form data
-    const validatedData = NGOFormSubmissionSchema.parse(body);
+    console.log(body)
+    // const validatedData = NGOFormSubmissionSchema.parse(body);
     
     // Create the project submission
-    const submission = await NGOProjectService.createSubmission(validatedData, userId);
+    const submission = await NGOProjectService.createSubmission(body, userId);
 
     return NextResponse.json({
       success: true,
