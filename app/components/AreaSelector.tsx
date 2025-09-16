@@ -1,20 +1,24 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import dynamic from 'next/dynamic';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import { useState, useEffect, useCallback } from "react";
+import dynamic from "next/dynamic";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import { Button } from "@/components/ui/button";
 
 // Fix Leaflet default marker icon issue in Next.js
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 });
 
 // Dynamically import map component to avoid SSR issues
-const MapComponent = dynamic(() => import('./MapComponent'), {
+const MapComponent = dynamic(() => import("./MapComponent"), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full bg-gray-100 animate-pulse flex items-center justify-center">
@@ -28,21 +32,39 @@ interface Coordinates {
   lng: number;
 }
 
-export default function AreaSelector() {
-  const [selectedLocation, setSelectedLocation] = useState<Coordinates | null>(null);
-  const [areaSize, setAreaSize] = useState<number>(1);
-  const [areaUnit, setAreaUnit] = useState<'hectares' | 'acres'>('hectares');
-  const [mapCenter, setMapCenter] = useState<Coordinates>({ lat: 40.7128, lng: -74.0060 });
-  const [isLocating, setIsLocating] = useState(false);
-  const [locationError, setLocationError] = useState<string>('');
-  
+export default function AreaSelector({
+  locationError,
+  isLocating,
+  setOpenMap,
+  setIsLocating,
+  setMapCenter,
+  setAreaUnit,
+  setAreaSize,
+  setSelectedLocation,
+  mapCenter,
+  areaUnit,
+  areaSize,
+  selectedLocation,
+  setLocationError,
+}: {
+  locationError: string;
+  setMapCenter: any;
+  setAreaUnit: any;
+  setAreaSize: any;
+  setSelectedLocation: any;
+  mapCenter: any;
+  areaUnit: any;
+  areaSize: any;
+  selectedLocation: any;
+  setLocationError: any;
+}) {
   // Get user's current location
   const getCurrentLocation = useCallback(() => {
     setIsLocating(true);
-    setLocationError('');
+    setLocationError("");
 
     if (!navigator.geolocation) {
-      setLocationError('Geolocation is not supported by your browser');
+      setLocationError("Geolocation is not supported by your browser");
       setIsLocating(false);
       return;
     }
@@ -71,7 +93,8 @@ export default function AreaSelector() {
 
   // Convert area to square meters for calculations
   const getAreaInSquareMeters = useCallback(() => {
-    const baseArea = areaUnit === 'hectares' ? areaSize * 10000 : areaSize * 4046.86;
+    const baseArea =
+      areaUnit === "hectares" ? areaSize * 10000 : areaSize * 4046.86;
     return baseArea;
   }, [areaSize, areaUnit]);
 
@@ -99,11 +122,10 @@ export default function AreaSelector() {
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
           Interactive Area Visualizer
         </h1>
-        
+
         {/* Controls Panel */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            
             {/* Location Controls */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
@@ -113,24 +135,56 @@ export default function AreaSelector() {
                 onClick={getCurrentLocation}
                 disabled={isLocating}
                 className={`w-full px-4 py-2 rounded-md text-white font-medium transition-colors
-                  ${isLocating 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+                  ${
+                    isLocating
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
                   }`}
               >
                 {isLocating ? (
                   <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Locating...
                   </span>
                 ) : (
                   <span className="flex items-center justify-center">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
                     </svg>
                     Use Current Location
                   </span>
@@ -146,7 +200,10 @@ export default function AreaSelector() {
 
             {/* Area Input */}
             <div className="space-y-2">
-              <label htmlFor="area-input" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="area-input"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Area Size
               </label>
               <div className="flex space-x-2">
@@ -162,7 +219,9 @@ export default function AreaSelector() {
                 />
                 <select
                   value={areaUnit}
-                  onChange={(e) => setAreaUnit(e.target.value as 'hectares' | 'acres')}
+                  onChange={(e) =>
+                    setAreaUnit(e.target.value as "hectares" | "acres")
+                  }
                   className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="hectares">Hectares</option>
@@ -178,28 +237,30 @@ export default function AreaSelector() {
               </label>
               <div className="bg-gray-50 rounded-md p-3 space-y-1">
                 <p className="text-sm text-gray-600">
-                  <span className="font-medium">Selected:</span> {areaSize} {areaUnit}
+                  <span className="font-medium">Selected:</span> {areaSize}{" "}
+                  {areaUnit}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <span className="font-medium">Equivalent:</span>{' '}
-                  {areaUnit === 'hectares' 
+                  <span className="font-medium">Equivalent:</span>{" "}
+                  {areaUnit === "hectares"
                     ? `${(areaSize * 2.47105).toFixed(2)} acres`
-                    : `${(areaSize / 2.47105).toFixed(2)} hectares`
-                  }
+                    : `${(areaSize / 2.47105).toFixed(2)} hectares`}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <span className="font-medium">Circle Radius:</span>{' '}
+                  <span className="font-medium">Circle Radius:</span>{" "}
                   {calculateRadius().toFixed(1)} meters
                 </p>
               </div>
             </div>
+            <Button onClick={()=>setOpenMap(false)}>Save</Button>
           </div>
 
           {selectedLocation && (
             <div className="mt-4 pt-4 border-t border-gray-200">
               <p className="text-sm text-gray-600">
-                <span className="font-medium">Selected Location:</span>{' '}
-                Latitude: {selectedLocation.lat.toFixed(6)}, Longitude: {selectedLocation.lng.toFixed(6)}
+                <span className="font-medium">Selected Location:</span>{" "}
+                Latitude: {selectedLocation.lat.toFixed(6)}, Longitude:{" "}
+                {selectedLocation.lng.toFixed(6)}
               </p>
             </div>
           )}

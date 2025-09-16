@@ -1,55 +1,77 @@
-"use client"
+// "use client"
+"use client";
+import dynamic from "next/dynamic";
 
-import type React from "react"
-import { useState } from "react"
-import axios from "axios"
-import { useRouter } from "next/navigation"
+// Dynamically import the AreaSelector component to avoid SSR issues
+const AreaSelector = dynamic(() => import("@/app/components/AreaSelector"), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading map application...</p>
+      </div>
+    </div>
+  ),
+});
+import type React from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 interface NGOFormData {
   // Project/Organization Details
-  projectName: string
-  organizationName: string
-  contactEmail: string
-  contactPhone: string
-  projectLocation: string
-  gpsLatitude: string
-  gpsLongitude: string
-  landArea: string
-  landAreaUnit: string
-  mapPolygon: File | null
-  
+  projectName: string;
+  organizationName: string;
+  contactEmail: string;
+  contactPhone: string;
+  projectLocation: string;
+  gpsLatitude: string;
+  gpsLongitude: string;
+  landArea: string;
+  landAreaUnit: string;
+  mapPolygon: File | null;
+
   // Project Type
-  projectType: string
-  
+  projectType: string;
+
   // Monitoring Data
-  monitoringStartDate: string
-  monitoringEndDate: string
-  dataCollectionMethod: string
-  dataSources: string
-  collectionFrequency: string
-  
+  monitoringStartDate: string;
+  monitoringEndDate: string;
+  dataCollectionMethod: string;
+  dataSources: string;
+  collectionFrequency: string;
+
   // Measurement Inputs
-  satelliteImages: File | null
-  droneImages: File | null
-  geotaggedPhotos: File | null
-  biomassData: string
-  soilSampleDetails: string
-  sedimentCoreDetails: string
-  waterQualityParams: string
-  
+  satelliteImages: File | null;
+  droneImages: File | null;
+  geotaggedPhotos: File | null;
+  biomassData: string;
+  soilSampleDetails: string;
+  sedimentCoreDetails: string;
+  waterQualityParams: string;
+
   // Activity Reports
-  activityDescription: string
-  plantingDates: string
-  speciesPlanted: string
-  fieldSurveyReports: File | null
-  
+  activityDescription: string;
+  plantingDates: string;
+  speciesPlanted: string;
+  fieldSurveyReports: File | null;
+
   // Additional Evidence
-  additionalEvidence: File | null
+  additionalEvidence: File | null;
 }
 
 export default function NGOProjectSubmissionPage() {
-  const router =  useRouter();
-  const [submitting, setSubmitting] = useState(false)
-  const [currentSection, setCurrentSection] = useState(0)
+  const router = useRouter();
+  const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
+  const [areaSize, setAreaSize] = useState<number>(1);
+  const [areaUnit, setAreaUnit] = useState<'hectares' | 'acres'>('hectares');
+  const [mapCenter, setMapCenter] = useState<any>({ lat: 40.7128, lng: -74.0060 });
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string>('');
+  const [submitting, setSubmitting] = useState(false);
+  const [currentSection, setCurrentSection] = useState(0);
+  const [openMap, setOpenMap] = useState(false);
   const [formData, setFormData] = useState<NGOFormData>({
     projectName: "",
     organizationName: "",
@@ -78,60 +100,76 @@ export default function NGOProjectSubmissionPage() {
     plantingDates: "",
     speciesPlanted: "",
     fieldSurveyReports: null,
-    additionalEvidence: null
-  })
+    additionalEvidence: null,
+  });
+
+  useEffect(()=>{
+
+    setFormData((prev)=>({...prev, gpsLatitude:mapCenter.lat, gpsLongitude:mapCenter.lng}));
+    setFormData((prev)=>({...prev, landArea:areaSize, landAreaUnit:areaUnit}));
+
+  },[mapCenter.lat,areaUnit,areaSize])
 
   // Dynamic sections based on project type
   const getSections = (projectType: string) => {
-    const baseSections = ["Project Details", "Monitoring Data"]
-    
+    const baseSections = ["Project Details", "Monitoring Data"];
+
     switch (projectType) {
       case "blue":
-        return [...baseSections, "Blue Carbon Data", "Evidence Upload"]
+        return [...baseSections, "Blue Carbon Data", "Evidence Upload"];
       case "green":
-        return [...baseSections, "Green Carbon Data", "Evidence Upload"]
+        return [...baseSections, "Green Carbon Data", "Evidence Upload"];
       case "yellow":
-        return [...baseSections, "Yellow Carbon Data", "Evidence Upload"]
+        return [...baseSections, "Yellow Carbon Data", "Evidence Upload"];
       default:
-        return ["Project Details", "Monitoring Data", "Measurement Inputs", "Evidence Upload"]
+        return [
+          "Project Details",
+          "Monitoring Data",
+          "Measurement Inputs",
+          "Evidence Upload",
+        ];
     }
-  }
+  };
 
-  const sections = getSections(formData.projectType)
+  const sections = getSections(formData.projectType);
 
-  function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+  function handleInputChange(
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name } = e.target
-    const file = e.target.files?.[0] || null
-    setFormData(prev => ({ ...prev, [name]: file }))
+    const { name } = e.target;
+    const file = e.target.files?.[0] || null;
+    setFormData((prev) => ({ ...prev, [name]: file }));
   }
 
   // setSubmitting(false)
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setSubmitting(false)
-    const data = await axios.post("/api/projects",{data:formData})
-    console.log("NGO Form Data:", formData)
+    e.preventDefault();
+    setSubmitting(false);
+    const data = await axios.post("/api/projects", { data: formData });
+    console.log("NGO Form Data:", formData);
     // setTimeout(() => {
     //   alert("Project submitted for verification! You will be notified once verification is complete.")
     //   setSubmitting(false)
     // }, 2000)
-    router.push("/org/dashboard")
+    router.push("/org/dashboard");
   }
 
   function nextSection() {
     if (currentSection < sections.length - 1) {
-      setCurrentSection(currentSection + 1)
+      setCurrentSection(currentSection + 1);
     }
   }
 
   function prevSection() {
     if (currentSection > 0) {
-      setCurrentSection(currentSection - 1)
+      setCurrentSection(currentSection - 1);
     }
   }
 
@@ -139,20 +177,23 @@ export default function NGOProjectSubmissionPage() {
     backgroundColor: "#FFFFFF",
     border: "1px solid #D1D5DB",
     color: "#111827",
-  }
+  };
 
   const sectionStyle = {
     backgroundColor: "#FFFFFF",
     border: "1px solid #E5E7EB",
-  }
+  };
 
   return (
     <main className="min-h-dvh bg-gray-50">
       <div className="mx-auto max-w-4xl px-4 py-8">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-green-600">NGO Project Submission</h1>
+          <h1 className="text-3xl font-bold text-green-600">
+            NGO Project Submission
+          </h1>
           <p className="text-gray-600 mt-2">
-            Please fill all mandatory project details and upload supporting materials for MRV verification.
+            Please fill all mandatory project details and upload supporting
+            materials for MRV verification.
           </p>
         </header>
 
@@ -170,15 +211,19 @@ export default function NGOProjectSubmissionPage() {
                 >
                   {index + 1}
                 </div>
-                <span className={`ml-2 text-sm ${
-                  index <= currentSection ? "text-gray-900" : "text-gray-500"
-                }`}>
+                <span
+                  className={`ml-2 text-sm ${
+                    index <= currentSection ? "text-gray-900" : "text-gray-500"
+                  }`}
+                >
                   {section}
                 </span>
                 {index < sections.length - 1 && (
-                  <div className={`w-16 h-0.5 mx-4 ${
-                    index < currentSection ? "bg-green-600" : "bg-gray-200"
-                  }`} />
+                  <div
+                    className={`w-16 h-0.5 mx-4 ${
+                      index < currentSection ? "bg-green-600" : "bg-gray-200"
+                    }`}
+                  />
                 )}
               </div>
             ))}
@@ -192,10 +237,13 @@ export default function NGOProjectSubmissionPage() {
               <h2 className="text-xl font-semibold text-gray-900 border-b pb-2">
                 Project / Organization Details
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="projectName" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="projectName"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Project Name *
                   </label>
                   <input
@@ -212,7 +260,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="organizationName" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="organizationName"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Organization / NGO Name *
                   </label>
                   <input
@@ -229,7 +280,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="contactEmail" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="contactEmail"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Contact Email *
                   </label>
                   <input
@@ -246,7 +300,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="contactPhone" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="contactPhone"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Contact Phone *
                   </label>
                   <input
@@ -263,7 +320,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="projectLocation" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="projectLocation"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Project Location *
                   </label>
                   <input
@@ -280,7 +340,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="projectType" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="projectType"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Carbon Credit Type *
                   </label>
                   <select
@@ -294,15 +357,22 @@ export default function NGOProjectSubmissionPage() {
                   >
                     <option value="">Select Carbon Credit Type</option>
                     <option value="blue">Blue Carbon (Coastal & Marine)</option>
-                    <option value="green">Green Carbon (Forests & Grasslands)</option>
-                    <option value="yellow">Yellow Carbon (Agricultural Soils)</option>
+                    <option value="green">
+                      Green Carbon (Forests & Grasslands)
+                    </option>
+                    <option value="yellow">
+                      Yellow Carbon (Agricultural Soils)
+                    </option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label htmlFor="gpsLatitude" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="gpsLatitude"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     GPS Latitude *
                   </label>
                   <input
@@ -320,7 +390,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="gpsLongitude" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="gpsLongitude"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     GPS Longitude *
                   </label>
                   <input
@@ -336,9 +409,24 @@ export default function NGOProjectSubmissionPage() {
                     placeholder="e.g., -62.2159"
                   />
                 </div>
-
+                <Button
+                  onClick={() => {
+                    setOpenMap(true);
+                  }}
+                >
+                  Get Location
+                </Button>
+                {openMap && (
+                  <div className="absolute w-full h-full top-0 left-0 z-10">
+                    <AreaSelector setOpenMap={setOpenMap}  setIsLocating={setIsLocating} isLocating={isLocating} locationError={locationError}  setMapCenter={setMapCenter} setAreaUnit={setAreaUnit} setAreaSize={setAreaSize} setSelectedLocation={setSelectedLocation}
+                     mapCenter={mapCenter} areaUnit={areaUnit} areaSize={areaSize} selectedLocation={selectedLocation} setLocationError={setLocationError}  />
+                  </div>
+                )}
                 <div>
-                  <label htmlFor="landArea" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="landArea"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Project Area (hectares) *
                   </label>
                   <div className="flex">
@@ -370,7 +458,10 @@ export default function NGOProjectSubmissionPage() {
               </div>
 
               <div>
-                <label htmlFor="mapPolygon" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="mapPolygon"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Map Polygon Upload
                 </label>
                 <input
@@ -383,7 +474,8 @@ export default function NGOProjectSubmissionPage() {
                   style={inputStyle}
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Upload GeoJSON, KML, Shapefile, or GPX files containing project boundaries
+                  Upload GeoJSON, KML, Shapefile, or GPX files containing
+                  project boundaries
                 </p>
               </div>
             </div>
@@ -395,10 +487,13 @@ export default function NGOProjectSubmissionPage() {
               <h2 className="text-xl font-semibold text-gray-900 border-b pb-2">
                 Monitoring Data
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="monitoringStartDate" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="monitoringStartDate"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Monitoring Period Start Date *
                   </label>
                   <input
@@ -414,7 +509,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="monitoringEndDate" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="monitoringEndDate"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Monitoring Period End Date *
                   </label>
                   <input
@@ -430,7 +528,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="dataCollectionMethod" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="dataCollectionMethod"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Data Collection Methods *
                   </label>
                   <select
@@ -452,7 +553,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="collectionFrequency" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="collectionFrequency"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Frequency of Data Collection *
                   </label>
                   <select
@@ -475,7 +579,10 @@ export default function NGOProjectSubmissionPage() {
               </div>
 
               <div>
-                <label htmlFor="dataSources" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="dataSources"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Data Sources *
                 </label>
                 <textarea
@@ -499,10 +606,13 @@ export default function NGOProjectSubmissionPage() {
               <h2 className="text-xl font-semibold text-gray-900 border-b pb-2">
                 Blue Carbon Data (Coastal & Marine Ecosystems)
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="satelliteImages" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="satelliteImages"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Upload Satellite & Drone Images (geotagged) *
                   </label>
                   <input
@@ -517,12 +627,16 @@ export default function NGOProjectSubmissionPage() {
                     style={inputStyle}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Upload satellite imagery and drone survey images (TIFF, GeoTIFF preferred)
+                    Upload satellite imagery and drone survey images (TIFF,
+                    GeoTIFF preferred)
                   </p>
                 </div>
 
                 <div>
-                  <label htmlFor="geotaggedPhotos" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="geotaggedPhotos"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Geotagged Photos / Videos *
                   </label>
                   <input
@@ -537,14 +651,18 @@ export default function NGOProjectSubmissionPage() {
                     style={inputStyle}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Upload geotagged field photos and videos of coastal/marine ecosystems
+                    Upload geotagged field photos and videos of coastal/marine
+                    ecosystems
                   </p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="sedimentCoreDetails" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="sedimentCoreDetails"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Sediment Core Sample Data *
                   </label>
                   <textarea
@@ -561,7 +679,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="biomassData" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="biomassData"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Plant Biomass/Species Information *
                   </label>
                   <textarea
@@ -578,7 +699,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="waterQualityParams" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="waterQualityParams"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Water Quality Parameters *
                   </label>
                   <textarea
@@ -603,10 +727,13 @@ export default function NGOProjectSubmissionPage() {
               <h2 className="text-xl font-semibold text-gray-900 border-b pb-2">
                 Green Carbon Data (Terrestrial Forests & Grasslands)
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="satelliteImages" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="satelliteImages"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Upload Satellite & Drone Images (geotagged) *
                   </label>
                   <input
@@ -621,12 +748,16 @@ export default function NGOProjectSubmissionPage() {
                     style={inputStyle}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Upload satellite imagery and drone survey images (TIFF, GeoTIFF preferred)
+                    Upload satellite imagery and drone survey images (TIFF,
+                    GeoTIFF preferred)
                   </p>
                 </div>
 
                 <div>
-                  <label htmlFor="geotaggedPhotos" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="geotaggedPhotos"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Geotagged Photos / Videos *
                   </label>
                   <input
@@ -641,14 +772,18 @@ export default function NGOProjectSubmissionPage() {
                     style={inputStyle}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Upload geotagged field photos and videos of forest/grassland ecosystems
+                    Upload geotagged field photos and videos of forest/grassland
+                    ecosystems
                   </p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="biomassData" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="biomassData"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Biomass/Plant Measurements *
                   </label>
                   <textarea
@@ -665,7 +800,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="soilSampleDetails" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="soilSampleDetails"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Soil Sample Data *
                   </label>
                   <textarea
@@ -682,7 +820,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="speciesPlanted" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="speciesPlanted"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Species / Forest Type Description *
                   </label>
                   <textarea
@@ -707,10 +848,13 @@ export default function NGOProjectSubmissionPage() {
               <h2 className="text-xl font-semibold text-gray-900 border-b pb-2">
                 Yellow Carbon Data (Agricultural Soils & Practices)
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="satelliteImages" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="satelliteImages"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Upload Satellite Images (geotagged) *
                   </label>
                   <input
@@ -725,12 +869,16 @@ export default function NGOProjectSubmissionPage() {
                     style={inputStyle}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Upload satellite imagery of agricultural fields (TIFF, GeoTIFF preferred)
+                    Upload satellite imagery of agricultural fields (TIFF,
+                    GeoTIFF preferred)
                   </p>
                 </div>
 
                 <div>
-                  <label htmlFor="geotaggedPhotos" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="geotaggedPhotos"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Proof of Practice Photos *
                   </label>
                   <input
@@ -745,14 +893,18 @@ export default function NGOProjectSubmissionPage() {
                     style={inputStyle}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Upload photos showing farming practices, soil conditions, crop rotations
+                    Upload photos showing farming practices, soil conditions,
+                    crop rotations
                   </p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="soilSampleDetails" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="soilSampleDetails"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Soil Sample Data *
                   </label>
                   <textarea
@@ -769,7 +921,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="speciesPlanted" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="speciesPlanted"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Crop and Rotation Details *
                   </label>
                   <textarea
@@ -786,7 +941,10 @@ export default function NGOProjectSubmissionPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="activityDescription" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="activityDescription"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Description of Restoration & Conservation Activities *
                   </label>
                   <textarea
@@ -811,10 +969,13 @@ export default function NGOProjectSubmissionPage() {
               <h2 className="text-xl font-semibold text-gray-900 border-b pb-2">
                 Evidence Upload
               </h2>
-              
+
               <div className="space-y-6">
                 <div>
-                  <label htmlFor="fieldSurveyReports" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="fieldSurveyReports"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Upload Field Survey or Audit Reports *
                   </label>
                   <input
@@ -829,12 +990,16 @@ export default function NGOProjectSubmissionPage() {
                     style={inputStyle}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Upload field survey reports, third-party audit reports, and documentation
+                    Upload field survey reports, third-party audit reports, and
+                    documentation
                   </p>
                 </div>
 
                 <div>
-                  <label htmlFor="additionalEvidence" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="additionalEvidence"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Upload Any Additional Evidence (photos, videos) *
                   </label>
                   <input
@@ -849,7 +1014,8 @@ export default function NGOProjectSubmissionPage() {
                     style={inputStyle}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Upload any additional supporting evidence, photos, videos, or documents
+                    Upload any additional supporting evidence, photos, videos,
+                    or documents
                   </p>
                 </div>
               </div>
@@ -888,5 +1054,5 @@ export default function NGOProjectSubmissionPage() {
         </form>
       </div>
     </main>
-  )
+  );
 }
