@@ -33,7 +33,7 @@ interface NGOFormData {
   landArea: string;
   landAreaUnit: string;
   mapPolygon: File | null;
-
+  imagesList: Object[];
   // Project Type
   projectType: string;
 
@@ -45,9 +45,9 @@ interface NGOFormData {
   collectionFrequency: string;
 
   // Measurement Inputs
-  satelliteImages: File[] | null|File;
-  droneImages: File[] | null|File;
-  geotaggedPhotos: File[] | null|File;
+  satelliteImages: File[] | null | File;
+  droneImages: File[] | null | File;
+  geotaggedPhotos: File[] | null | File;
   biomassData: string;
   soilSampleDetails: string;
   sedimentCoreDetails: string;
@@ -57,15 +57,15 @@ interface NGOFormData {
   activityDescription: string;
   plantingDates: string;
   speciesPlanted: string;
-  fieldSurveyReports: File[] | File |null;
+  fieldSurveyReports: File[] | File | null;
 
   // Additional Evidence
-  additionalEvidence: File[] | null |File;
+  additionalEvidence: File[] | null | File;
 }
 
 export default function NGOProjectSubmissionPage() {
   const router = useRouter();
-  const fileUploader = useFileUpload()
+  const fileUploader = useFileUpload();
   const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
   const [areaSize, setAreaSize] = useState<number>(1);
   const [areaUnit, setAreaUnit] = useState<"hectares" | "acres">("hectares");
@@ -109,6 +109,7 @@ export default function NGOProjectSubmissionPage() {
     speciesPlanted: "",
     fieldSurveyReports: null,
     additionalEvidence: null,
+    imagesList: [],
   });
 
   useEffect(() => {
@@ -161,35 +162,55 @@ export default function NGOProjectSubmissionPage() {
     if (!files) {
       return;
     }
-    
+
     // Convert FileList to an array
     const filesArray = Array.from(files);
-  
+
     setFormData((prev) => {
       // Check if the previous state for this key is an array
       const prevFiles = Array.isArray(prev[name]) ? prev[name] : [];
-      
+
       // Concatenate the previous files with the new files
-      return { 
-        ...prev, 
-        [name]: [...prevFiles, ...filesArray] 
+      return {
+        ...prev,
+        [name]: [...prevFiles, ...filesArray],
       };
     });
   }
 
   // setSubmitting(false)
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-
     e.preventDefault();
     setSubmitting(false);
-    const satelliteImageUrl  = await fileUploader.uploadMultipleFiles(formData.satelliteImages || null);
-    const mapPolygonUrl = await fileUploader.uploadFile(formData.mapPolygon || null);
-    const droneImagesUrl = await fileUploader.uploadMultipleFiles(formData.droneImages || null);
-    const geoTaggedPhotosUrl = await fileUploader.uploadMultipleFiles(formData.geotaggedPhotos || null);
-    const fieldSurveyReportsUrl = await fileUploader.uploadMultipleFiles(formData.fieldSurveyReports || null);
-    const additionalEvidenceUrl = await fileUploader.uploadMultipleFiles(formData.additionalEvidence || null);
-    console.log("datelite",satelliteImageUrl)
-    setFormData((prev)=>({...prev,satelliteImages:satelliteImageUrl,mapPolygon:mapPolygonUrl,droneImages:droneImagesUrl,geotaggedPhotos:geoTaggedPhotosUrl,fieldSurveyReports:fieldSurveyReportsUrl,additionalEvidence:additionalEvidenceUrl}))
+    const satelliteImageUrl = await fileUploader.uploadMultipleFiles(
+      formData.satelliteImages || null
+    );
+    const mapPolygonUrl = await fileUploader.uploadFile(
+      formData.mapPolygon || null
+    );
+    const droneImagesUrl = await fileUploader.uploadMultipleFiles(
+      formData.droneImages || null
+    );
+    const geoTaggedPhotosUrl = await fileUploader.uploadMultipleFiles(
+      formData.geotaggedPhotos || null
+    );
+    const fieldSurveyReportsUrl = await fileUploader.uploadMultipleFiles(
+      formData.fieldSurveyReports || null
+    );
+    const additionalEvidenceUrl = await fileUploader.uploadMultipleFiles(
+      formData.additionalEvidence || null
+    );
+    console.log("datelite", satelliteImageUrl);
+    setFormData((prev) => ({
+      ...prev,
+      satelliteImages: satelliteImageUrl,
+      mapPolygon: mapPolygonUrl,
+      droneImages: droneImagesUrl,
+      geotaggedPhotos: geoTaggedPhotosUrl,
+      fieldSurveyReports: fieldSurveyReportsUrl,
+      additionalEvidence: additionalEvidenceUrl,
+      imagesList: imagesList,
+    }));
     console.log("NGO Form Data:", formData);
     const data = await axios.post("/api/projects", { data: formData });
     // router.push("/org/dashboard");
@@ -197,8 +218,8 @@ export default function NGOProjectSubmissionPage() {
 
   useEffect(() => {
     console.log(imagesList);
-    console.log(formData.satelliteImages)
-  }, [imagesList,formData]);
+    console.log(formData.satelliteImages);
+  }, [imagesList, formData]);
 
   function nextSection() {
     if (currentSection < sections.length - 1) {
@@ -231,8 +252,8 @@ export default function NGOProjectSubmissionPage() {
             setOpenSatelliteBox={setOpenSatelliteBox}
             imagesList={imagesList}
             setImagesList={setImagesList}
-            latitude = {Number(formData.gpsLatitude)}
-            longitude = {Number(formData.gpsLongitude)}
+            latitude={Number(formData.gpsLatitude)}
+            longitude={Number(formData.gpsLongitude)}
             areaSize={Number(formData.landArea)}
             areaUnit={formData.landAreaUnit}
           />
