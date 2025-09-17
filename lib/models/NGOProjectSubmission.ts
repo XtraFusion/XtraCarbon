@@ -142,26 +142,26 @@ const BlueCarbonDataSchema = new Schema<IBlueCarbonData>({
   sedimentCoreDetails: { type: String, required: true },
   biomassData: { type: String, required: true },
   waterQualityParams: { type: String, required: true },
-  satelliteImages: [FileUploadSchema],
-  droneImages: [FileUploadSchema],
-  geotaggedPhotos: [FileUploadSchema]
+  satelliteImages: [Object],
+  droneImages: [Object],
+  geotaggedPhotos: [Object]
 }, { _id: false });
 
 const GreenCarbonDataSchema = new Schema<IGreenCarbonData>({
   biomassData: { type: String, required: true },
   soilSampleDetails: { type: String, required: true },
   speciesPlanted: { type: String, required: true },
-  satelliteImages: [FileUploadSchema],
-  droneImages: [FileUploadSchema],
-  geotaggedPhotos: [FileUploadSchema]
+  satelliteImages: [Object],
+  droneImages: [Object],
+  geotaggedPhotos: [Object]
 }, { _id: false });
 
 const YellowCarbonDataSchema = new Schema<IYellowCarbonData>({
   soilSampleDetails: { type: String, required: true },
   speciesPlanted: { type: String, required: true },
   activityDescription: { type: String, required: true },
-  satelliteImages: [FileUploadSchema],
-  geotaggedPhotos: [FileUploadSchema]
+  satelliteImages: [Object],
+  geotaggedPhotos: [Object]
 }, { _id: false });
 
 // Main NGO Project Submission schema

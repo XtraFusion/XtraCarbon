@@ -55,7 +55,7 @@ export class UserService {
 export class NGOProjectService {
   static async createSubmission(data: any, submittedBy: string) {
     const {data:formData} =data;
-    // console.log("Creating submission with data:", formData, "by user:", submittedBy);
+    console.log("Creating submission with data:", formData, "by user:", submittedBy);
     await ensureDBConnection();
     
     // Transform form data to match schema
@@ -83,7 +83,12 @@ export class NGOProjectService {
         frequency: formData.collectionFrequency
       },
       submittedBy,
-      submissionStatus: 'submitted' as const
+      fieldSurveyReports: formData.fieldSurveyReports,
+      submissionStatus: 'submitted' as const,
+      additionalEvidence:formData.additionalEvidence,
+      verificationStatus:"pending"
+
+
     };
 
     // Add project-specific data based on type
@@ -91,19 +96,28 @@ export class NGOProjectService {
       submissionData.blueCarbonData = {
         sedimentCoreDetails: formData.sedimentCoreDetails,
         biomassData: formData.biomassData,
-        waterQualityParams: formData.waterQualityParams
+        waterQualityParams: formData.waterQualityParams,
+        geotaggedPhotos:formData.geotaggedPhotos,
+        droneImages:formData.droneImages,
+        satelliteImages:formData.satelliteImages
       };
     } else if (formData.projectType === 'green') {
       submissionData.greenCarbonData = {
         biomassData: formData.biomassData,
         soilSampleDetails: formData.soilSampleDetails,
-        speciesPlanted: formData.speciesPlanted
+        speciesPlanted: formData.speciesPlanted,
+        geotaggedPhotos:formData.geotaggedPhotos,
+        droneImages:formData.droneImages,
+        satelliteImages:formData.satelliteImages
       };
     } else if (formData.projectType === 'yellow') {
       submissionData.yellowCarbonData = {
         soilSampleDetails: formData.soilSampleDetails,
         speciesPlanted: formData.speciesPlanted,
-        activityDescription: formData.activityDescription
+        activityDescription: formData.activityDescription,
+        geotaggedPhotos:formData.geotaggedPhotos,
+        droneImages:formData.droneImages,
+        satelliteImages:formData.satelliteImages
       };
     }
 
