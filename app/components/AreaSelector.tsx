@@ -58,6 +58,12 @@ export default function AreaSelector({
   selectedLocation: any;
   setLocationError: any;
 }) {
+
+    const getStaticMapUrl = (lat: number, lng: number, zoom = 15) => {
+        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY; // secure in env
+        return `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=600x400&markers=color:red|${lat},${lng}&key=${apiKey}`;
+      };
+      
   // Get user's current location
   const getCurrentLocation = useCallback(() => {
     setIsLocating(true);
@@ -115,6 +121,37 @@ export default function AreaSelector({
   const handleMapClick = (coords: Coordinates) => {
     setSelectedLocation(coords);
   };
+  function generateGeoJSON(
+    location: { lat: number; lng: number },
+    radius: number
+  ) {
+    return {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [location.lng, location.lat], // GeoJSON uses [lng, lat]
+          },
+          properties: {
+            name: "Selected Location",
+            radius: radius,
+          },
+        },
+      ],
+    };
+  }
+
+  function downloadFile(content: string, filename: string, type: string) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -252,7 +289,26 @@ export default function AreaSelector({
                 </p>
               </div>
             </div>
-            <Button onClick={()=>setOpenMap(false)}>Save</Button>
+            <Button
+              onClick={() => {
+                if (!selectedLocation) return;
+
+                // GeoJSON
+                const geojson = generateGeoJSON(
+                  selectedLocation,
+                  calculateRadius()
+                );
+                downloadFile(
+                  JSON.stringify(geojson, null, 2),
+                  "location.geojson",
+                  "application/geo+json"
+                );
+                setOpenMap(false);
+            }
+            }
+            >
+              Save
+            </Button>
           </div>
 
           {selectedLocation && (
