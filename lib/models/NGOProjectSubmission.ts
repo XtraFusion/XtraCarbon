@@ -70,7 +70,7 @@ export interface INGOProjectSubmission extends Document {
   landArea: number;
   landAreaUnit: 'hectares' | 'acres';
   mapPolygon?: IFileUpload;
-  
+  imagesList?:Object[]
   // Monitoring data
   monitoringData: IMonitoringData;
   
@@ -259,7 +259,9 @@ const NGOProjectSubmissionSchema = new Schema<INGOProjectSubmission>({
   reviewDate: {
     type: Date
   },
-  
+  imagesList:{
+    type:Array
+  },
   // Verification information
   verifierId: {
     type: String,

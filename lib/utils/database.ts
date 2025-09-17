@@ -86,8 +86,8 @@ export class NGOProjectService {
       fieldSurveyReports: formData.fieldSurveyReports,
       submissionStatus: 'submitted' as const,
       additionalEvidence:formData.additionalEvidence,
-      verificationStatus:"pending"
-
+      verificationStatus:"pending",
+      imagesList:formData.imagesList
 
     };
 
