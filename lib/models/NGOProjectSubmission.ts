@@ -225,8 +225,8 @@ const NGOProjectSubmissionSchema = new Schema<INGOProjectSubmission>({
   yellowCarbonData: YellowCarbonDataSchema,
   
   // Additional evidence
-  fieldSurveyReports: [FileUploadSchema],
-  additionalEvidence: [FileUploadSchema],
+  fieldSurveyReports: [Object],
+  additionalEvidence: [Object],
   
   // Submission metadata
   submittedBy: {

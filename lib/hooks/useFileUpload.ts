@@ -45,10 +45,12 @@ export function useFileUpload() {
     }
   };
 
-  const uploadMultipleFiles = async (files: File[]) => {
+  const uploadMultipleFiles = async (files: File[] | null) => {
     setState({ uploading: true, progress: 0, error: null, result: null });
     const results = [];
-
+    console.log(files)
+  if(files==null) return [];
+  
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];

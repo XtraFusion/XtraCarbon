@@ -2,6 +2,7 @@ export interface Location {
     latitude: number;
     longitude: number;
     name?: string;
+    areaUnit?:string
     areaSize?: number; // in hectares
   }
   

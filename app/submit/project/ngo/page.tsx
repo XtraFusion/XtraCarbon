@@ -19,6 +19,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { SatelliteImageryDashboard } from "@/app/satellite-dashboard/_components/SatelliteImageryDashboard";
+import { useFileUpload } from "@/lib/hooks/useFileUpload";
 interface NGOFormData {
   // Project/Organization Details
   projectName: string;
@@ -43,9 +45,9 @@ interface NGOFormData {
   collectionFrequency: string;
 
   // Measurement Inputs
-  satelliteImages: File | null;
-  droneImages: File | null;
-  geotaggedPhotos: File | null;
+  satelliteImages: File[] | null|File;
+  droneImages: File[] | null|File;
+  geotaggedPhotos: File[] | null|File;
   biomassData: string;
   soilSampleDetails: string;
   sedimentCoreDetails: string;
@@ -55,23 +57,29 @@ interface NGOFormData {
   activityDescription: string;
   plantingDates: string;
   speciesPlanted: string;
-  fieldSurveyReports: File | null;
+  fieldSurveyReports: File[] | File |null;
 
   // Additional Evidence
-  additionalEvidence: File | null;
+  additionalEvidence: File[] | null |File;
 }
 
 export default function NGOProjectSubmissionPage() {
   const router = useRouter();
+  const fileUploader = useFileUpload()
   const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
   const [areaSize, setAreaSize] = useState<number>(1);
-  const [areaUnit, setAreaUnit] = useState<'hectares' | 'acres'>('hectares');
-  const [mapCenter, setMapCenter] = useState<any>({ lat: 40.7128, lng: -74.0060 });
+  const [areaUnit, setAreaUnit] = useState<"hectares" | "acres">("hectares");
+  const [mapCenter, setMapCenter] = useState<any>({
+    lat: 40.7128,
+    lng: -74.006,
+  });
   const [isLocating, setIsLocating] = useState(false);
-  const [locationError, setLocationError] = useState<string>('');
+  const [locationError, setLocationError] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [currentSection, setCurrentSection] = useState(0);
   const [openMap, setOpenMap] = useState(false);
+  const [openSatelliteBox, setOpenSatelliteBox] = useState(false);
+  const [imagesList, setImagesList] = useState<any[]>([]);
   const [formData, setFormData] = useState<NGOFormData>({
     projectName: "",
     organizationName: "",
@@ -103,12 +111,18 @@ export default function NGOProjectSubmissionPage() {
     additionalEvidence: null,
   });
 
-  useEffect(()=>{
-
-    setFormData((prev)=>({...prev, gpsLatitude:mapCenter.lat, gpsLongitude:mapCenter.lng}));
-    setFormData((prev)=>({...prev, landArea:areaSize, landAreaUnit:areaUnit}));
-
-  },[mapCenter.lat,areaUnit,areaSize])
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      gpsLatitude: mapCenter.lat,
+      gpsLongitude: mapCenter.lng,
+    }));
+    setFormData((prev) => ({
+      ...prev,
+      landArea: areaSize,
+      landAreaUnit: areaUnit,
+    }));
+  }, [mapCenter.lat, areaUnit, areaSize]);
 
   // Dynamic sections based on project type
   const getSections = (projectType: string) => {
@@ -143,23 +157,48 @@ export default function NGOProjectSubmissionPage() {
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name } = e.target;
-    const file = e.target.files?.[0] || null;
-    setFormData((prev) => ({ ...prev, [name]: file }));
+    const { name, files } = e.target;
+    if (!files) {
+      return;
+    }
+    
+    // Convert FileList to an array
+    const filesArray = Array.from(files);
+  
+    setFormData((prev) => {
+      // Check if the previous state for this key is an array
+      const prevFiles = Array.isArray(prev[name]) ? prev[name] : [];
+      
+      // Concatenate the previous files with the new files
+      return { 
+        ...prev, 
+        [name]: [...prevFiles, ...filesArray] 
+      };
+    });
   }
 
   // setSubmitting(false)
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+
     e.preventDefault();
     setSubmitting(false);
-    const data = await axios.post("/api/projects", { data: formData });
+    const satelliteImageUrl  = await fileUploader.uploadMultipleFiles(formData.satelliteImages || null);
+    const mapPolygonUrl = await fileUploader.uploadFile(formData.mapPolygon || null);
+    const droneImagesUrl = await fileUploader.uploadMultipleFiles(formData.droneImages || null);
+    const geoTaggedPhotosUrl = await fileUploader.uploadMultipleFiles(formData.geotaggedPhotos || null);
+    const fieldSurveyReportsUrl = await fileUploader.uploadMultipleFiles(formData.fieldSurveyReports || null);
+    const additionalEvidenceUrl = await fileUploader.uploadMultipleFiles(formData.additionalEvidence || null);
+    console.log("datelite",satelliteImageUrl)
+    setFormData((prev)=>({...prev,satelliteImages:satelliteImageUrl,mapPolygon:mapPolygonUrl,droneImages:droneImagesUrl,geotaggedPhotos:geoTaggedPhotosUrl,fieldSurveyReports:fieldSurveyReportsUrl,additionalEvidence:additionalEvidenceUrl}))
     console.log("NGO Form Data:", formData);
-    // setTimeout(() => {
-    //   alert("Project submitted for verification! You will be notified once verification is complete.")
-    //   setSubmitting(false)
-    // }, 2000)
-    router.push("/org/dashboard");
+    const data = await axios.post("/api/projects", { data: formData });
+    // router.push("/org/dashboard");
   }
+
+  useEffect(() => {
+    console.log(imagesList);
+    console.log(formData.satelliteImages)
+  }, [imagesList,formData]);
 
   function nextSection() {
     if (currentSection < sections.length - 1) {
@@ -186,6 +225,19 @@ export default function NGOProjectSubmissionPage() {
 
   return (
     <main className="min-h-dvh bg-gray-50">
+      {openSatelliteBox && (
+        <div className="absolute w-full h-full top-0 left-0 z-10">
+          <SatelliteImageryDashboard
+            setOpenSatelliteBox={setOpenSatelliteBox}
+            imagesList={imagesList}
+            setImagesList={setImagesList}
+            latitude = {Number(formData.gpsLatitude)}
+            longitude = {Number(formData.gpsLongitude)}
+            areaSize={Number(formData.landArea)}
+            areaUnit={formData.landAreaUnit}
+          />
+        </div>
+      )}
       <div className="mx-auto max-w-4xl px-4 py-8">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-green-600">
@@ -230,7 +282,7 @@ export default function NGOProjectSubmissionPage() {
           </div>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-8">
+        <form className="space-y-8" onSubmit={onSubmit}>
           {/* Section 1: Project Details */}
           {currentSection === 0 && (
             <div className="rounded-lg p-6 space-y-6" style={sectionStyle}>
@@ -418,8 +470,21 @@ export default function NGOProjectSubmissionPage() {
                 </Button>
                 {openMap && (
                   <div className="absolute w-full h-full top-0 left-0 z-10">
-                    <AreaSelector setOpenMap={setOpenMap}  setIsLocating={setIsLocating} isLocating={isLocating} locationError={locationError}  setMapCenter={setMapCenter} setAreaUnit={setAreaUnit} setAreaSize={setAreaSize} setSelectedLocation={setSelectedLocation}
-                     mapCenter={mapCenter} areaUnit={areaUnit} areaSize={areaSize} selectedLocation={selectedLocation} setLocationError={setLocationError}  />
+                    <AreaSelector
+                      setOpenMap={setOpenMap}
+                      setIsLocating={setIsLocating}
+                      isLocating={isLocating}
+                      locationError={locationError}
+                      setMapCenter={setMapCenter}
+                      setAreaUnit={setAreaUnit}
+                      setAreaSize={setAreaSize}
+                      setSelectedLocation={setSelectedLocation}
+                      mapCenter={mapCenter}
+                      areaUnit={areaUnit}
+                      areaSize={areaSize}
+                      selectedLocation={selectedLocation}
+                      setLocationError={setLocationError}
+                    />
                   </div>
                 )}
                 <div>
@@ -658,6 +723,13 @@ export default function NGOProjectSubmissionPage() {
               </div>
 
               <div className="space-y-4">
+                <div
+                  onClick={() => setOpenSatelliteBox(true)}
+                  className="cursor-pointer"
+                >
+                  Get Satellite Images
+                </div>
+
                 <div>
                   <label
                     htmlFor="sedimentCoreDetails"

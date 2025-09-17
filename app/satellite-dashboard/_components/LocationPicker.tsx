@@ -45,7 +45,8 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     }
   }, [selectedLocation]);
 
-  const handleUseCurrentLocation = () => {
+  const handleUseCurrentLocation = (e) => {
+    e.preventDefault();
     if (currentLocation) {
       onLocationSelect(currentLocation);
     }

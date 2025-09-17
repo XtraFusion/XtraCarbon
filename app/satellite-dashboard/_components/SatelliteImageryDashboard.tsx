@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Location, SatelliteImage, ImagerySearchParams } from '@/types/imagery';
 import { LocationPicker } from './LocationPicker';
 import { CoordinateInput } from './CoordinateInput';
@@ -16,19 +16,15 @@ import {
   Activity
 } from 'lucide-react';
 
-export const SatelliteImageryDashboard: React.FC = () => {
+export const SatelliteImageryDashboard: React.FC<{setOpenSatelliteBox: (open: boolean) => void, imagesList: any[], setImagesList: (imagesList: any[]) => void, latitude: number, longitude: number, areaSize: number, areaUnit: string}> = ({setOpenSatelliteBox, imagesList, setImagesList, latitude, longitude, areaSize, areaUnit}) => {
   const [selectedLocation, setSelectedLocation] = useState<Location | undefined>();
-  const [images, setImages] = useState<SatelliteImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleLocationSelect = (location: Location) => {
-    setSelectedLocation(location);
-    toast({
-      title: "Location Selected",
-      description: `Lat: ${location.latitude.toFixed(4)}, Lng: ${location.longitude.toFixed(4)}`,
-    });
-  };
+ useEffect(()=>{
+    setSelectedLocation({latitude,longitude,areaSize,areaUnit,name:""});
+
+ },[latitude,longitude,areaSize,areaUnit])
 
   const handleSearchImagery = async () => {
     if (!selectedLocation) {
@@ -41,7 +37,7 @@ export const SatelliteImageryDashboard: React.FC = () => {
     }
 
     setIsLoading(true);
-    setImages([]);
+    setImagesList([]);
 
     try {
       const searchParams: ImagerySearchParams = {
@@ -52,18 +48,18 @@ export const SatelliteImageryDashboard: React.FC = () => {
       };
 
       const results = await searchImagery(searchParams);
-      setImages(results);
+      setImagesList(results);
 
       if (results.length === 0) {
         toast({
-          title: "No Images Found",
+          title: "No imagesList Found",
           description: "No satellite imagery available for this location. Try a different area.",
           variant: "destructive",
         });
       } else {
         toast({
           title: "Imagery Found",
-          description: `Found ${results.length} satellite images for analysis.`,
+          description: `Found ${results.length} satellite imagesList for analysis.`,
         });
       }
     } catch (error) {
@@ -86,17 +82,17 @@ export const SatelliteImageryDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-black">
       {/* Header */}
       <header className="bg-gradient-earth shadow-elevation">
         <div className="container mx-auto px-6 py-8">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-white/10 rounded-lg">
-              <Satellite className="h-8 w-8 text-white" />
+              <Satellite className="h-8 w-8 text-black" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Satellite Imagery Dashboard</h1>
-              <p className="text-white/80 mt-1">
+              <h1 className="text-3xl font-bold text-black">Satellite Imagery Dashboard</h1>
+              <p className="text-black/80 mt-1">
                 Carbon Project Verification & MRV Analysis
               </p>
             </div>
@@ -104,15 +100,15 @@ export const SatelliteImageryDashboard: React.FC = () => {
           
           {/* Key Features */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-            <div className="flex items-center gap-3 text-white/90">
+            <div className="flex items-center gap-3 text-black/90">
               <Target className="h-5 w-5" />
               <span className="text-sm">Multi-source imagery fetching</span>
             </div>
-            <div className="flex items-center gap-3 text-white/90">
+            <div className="flex items-center gap-3 text-black/90">
               <TreePine className="h-5 w-5" />
               <span className="text-sm">Tree counting & forest analysis</span>
             </div>
-            <div className="flex items-center gap-3 text-white/90">
+            <div className="flex items-center gap-3 text-black/90">
               <Activity className="h-5 w-5" />
               <span className="text-sm">Temporal change detection</span>
             </div>
@@ -125,17 +121,17 @@ export const SatelliteImageryDashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Panel - Location Selection */}
           <div className="lg:col-span-1 space-y-6">
-            <LocationPicker
+            {/* <LocationPicker
               onLocationSelect={handleLocationSelect}
               selectedLocation={selectedLocation}
-            />
+            /> */}
             
             <Separator />
             
-            <CoordinateInput
+            {/* <CoordinateInput
               onLocationSubmit={handleLocationSelect}
               selectedLocation={selectedLocation}
-            />
+            /> */}
             
             {/* Search Button */}
             <Card className="p-4">
@@ -160,7 +156,7 @@ export const SatelliteImageryDashboard: React.FC = () => {
           {/* Right Panel - Imagery Gallery */}
           <div className="lg:col-span-2">
             <ImageryGallery
-              images={images}
+              images={imagesList}
               location={selectedLocation}
               isLoading={isLoading}
               onRefresh={handleSearchImagery}
@@ -169,6 +165,10 @@ export const SatelliteImageryDashboard: React.FC = () => {
           </div>
         </div>
       </main>
+        <div className='w-[300px] mx-auto py-10 flex gap-2'>
+            <Button onClick={()=>setOpenSatelliteBox(false)} className='bg-primary w-[40vh] text-white'>Save</Button>
+            <Button onClick={()=>setOpenSatelliteBox(false)} variant="outline" className='w-[40vh]'>Cancel</Button>
+        </div>
     </div>
   );
 };

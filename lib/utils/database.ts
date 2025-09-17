@@ -55,7 +55,7 @@ export class UserService {
 export class NGOProjectService {
   static async createSubmission(data: any, submittedBy: string) {
     const {data:formData} =data;
-    console.log("Creating submission with data:", formData, "by user:", submittedBy);
+    // console.log("Creating submission with data:", formData, "by user:", submittedBy);
     await ensureDBConnection();
     
     // Transform form data to match schema

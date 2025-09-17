@@ -131,10 +131,10 @@ export const ImageryGallery: React.FC<ImageryGalleryProps> = ({
       <Card className="p-6 bg-gradient-earth shadow-elevation">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Satellite className="h-6 w-6 text-white" />
+            <Satellite className="h-6 w-6 text-black" />
             <div>
-              <h2 className="text-xl font-bold text-white">Satellite Imagery</h2>
-              <p className="text-white/80">
+              <h2 className="text-xl font-bold text-black">Satellite Imagery</h2>
+              <p className="text-black/80">
                 {location 
                   ? `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}${location.areaSize ? ` • ${location.areaSize} hectares` : ''}`
                   : 'Select a location to view imagery'
@@ -149,7 +149,7 @@ export const ImageryGallery: React.FC<ImageryGalleryProps> = ({
               variant="secondary"
               size="sm"
               disabled={isLoading || !location}
-              className="bg-white/10 hover:bg-white/20 text-white border-white/20"
+              className="bg-white/10 hover:bg-white/20 text-black border-white/20"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -160,7 +160,7 @@ export const ImageryGallery: React.FC<ImageryGalleryProps> = ({
                 onClick={handleView3D}
                 variant="secondary"
                 size="sm"
-                className="bg-white/10 hover:bg-white/20 text-white border-white/20"
+                className="bg-white/10 hover:bg-white/20 text-black border-white/20"
               >
                 <Globe className="h-4 w-4 mr-2" />
                 View in 3D
@@ -171,10 +171,10 @@ export const ImageryGallery: React.FC<ImageryGalleryProps> = ({
         
         {images.length > 0 && (
           <div className="flex gap-2 mt-4">
-            <Badge variant="outline" className="bg-white/10 text-white border-white/20">
+            <Badge variant="outline" className="bg-white/10 text-black border-white/20">
               {images.length} images found
             </Badge>
-            <Badge variant="outline" className="bg-white/10 text-white border-white/20">
+            <Badge variant="outline" className="bg-white/10 text-black border-white/20">
               Latest: {new Date(images[0]?.date).toLocaleDateString()}
             </Badge>
           </div>
