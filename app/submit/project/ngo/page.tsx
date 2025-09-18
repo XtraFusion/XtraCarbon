@@ -217,8 +217,8 @@ export default function NGOProjectSubmissionPage() {
   }
 
   useEffect(() => {
-    console.log(imagesList);
-    console.log(formData.satelliteImages);
+    // console.log(imagesList);
+    // console.log(formData.satelliteImages);
   }, [imagesList, formData]);
 
   function nextSection() {
