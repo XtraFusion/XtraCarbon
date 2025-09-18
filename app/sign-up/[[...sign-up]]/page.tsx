@@ -100,9 +100,7 @@ export default function SignupPage() {
           <div className="flex justify-center">
             <SignUp
             
-              onSuccess={() => {
-                // Handle successful sign-up
-              }}
+            
               appearance={{
                 elements: {
                   formButtonPrimary: { 

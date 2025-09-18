@@ -17,13 +17,10 @@ const CreditSchema = new Schema<IUser>(
     clerkId: {
       type: String,
       required: true,
-      unique: true,
-      index: true,
     },
     email: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
       trim: true,
     },
@@ -54,10 +51,9 @@ const CreditSchema = new Schema<IUser>(
   },
   {
     timestamps: true,
-    collection: "users",
   }
 );
 
 // Avoid recompiling model in dev/watch mode
 export const Credit =
-  mongoose.models.User || mongoose.model<IUser>("Credit", CreditSchema);
+  mongoose.models.Credit || mongoose.model<IUser>("Credit", CreditSchema);

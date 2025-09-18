@@ -10,6 +10,7 @@ import {
   PaginationParams,
   PaginatedResponse
 } from '../types';
+import { Credit } from '../models/Credit';
 
 // Database connection helper
 export async function ensureDBConnection() {
@@ -32,12 +33,12 @@ export class UserService {
 
   static async findByClerkId(clerkId: string) {
     await ensureDBConnection();
-    return await User.findByClerkId(clerkId);
+    return await User?.findByClerkId(clerkId);
   }
 
   static async findByEmail(email: string) {
     await ensureDBConnection();
-    return await User.findByEmail(email);
+    return await User?.findByEmail(email);
   }
 
   static async updateUser(clerkId: string, updateData: any) {
@@ -87,8 +88,8 @@ export class NGOProjectService {
       submissionStatus: 'submitted' as const,
       additionalEvidence:formData.additionalEvidence,
       verificationStatus:"pending",
-      imagesList:formData.imagesList
-
+      imagesList:formData.imagesList,
+      proposedCredit:formData.proposedCredit
     };
 
     // Add project-specific data based on type
@@ -120,7 +121,7 @@ export class NGOProjectService {
         satelliteImages:formData.satelliteImages
       };
     }
-
+  
     return await NGOProjectSubmission.create(submissionData);
   }
 

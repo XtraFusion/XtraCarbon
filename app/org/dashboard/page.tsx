@@ -1,17 +1,36 @@
-"use client"
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  TreePine, 
-  Leaf, 
-  Plus, 
-  TrendingUp, 
+"use client";
+import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  TreePine,
+  Leaf,
+  Plus,
+  TrendingUp,
   Bell,
   LogOut,
   Search,
@@ -28,16 +47,68 @@ import {
   Clock,
   AlertCircle,
   XCircle,
-  ChevronDown
-} from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+  ChevronDown,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import axios from "axios";
 
 const OrganizationDashboard = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [projects, setProjects] = useState([]);
 
-  const projects = [
+  async function loadProjectData() {
+    const data = await axios.get("/api/projects/user");
+    // console.log(data.data.data);
+    setProjects(data.data.data)
+  }
+  useEffect(() => {
+    loadProjectData();
+  }, []);
+  const [creditTypeData,setCreditTypeData] =useState([
+    { name: "Blue Credits", value: 35, color: "#3B82F6" },
+    { name: "Green Credits", value: 45, color: "#10B981" },
+    { name: "Yellow Credits", value: 20, color: "#F59E0B" },
+  ]) ;
+  useEffect(()=>{
+    let blueCount=0;
+    let greenCount=0;
+    let yellowCount=0;
+    for(let i=0;i<projects.length;i++){
+          if(projects[i].projectType=="blue"){
+            blueCount++;
+          }
+          else if(projects[i].projectType=="yellow"){
+            yellowCount++;
+          }
+          else if(projects[i].projectType=="green"){
+            greenCount++;
+          }
+          else{
+
+          }
+    }
+
+    const data =[
+      { name: "Blue Credits", value: (blueCount/(blueCount+greenCount+yellowCount))*100, color: "#3B82F6" },
+      { name: "Green Credits", value: (greenCount/(blueCount+greenCount+yellowCount))*100, color: "#10B981" },
+      { name: "Yellow Credits", value: (yellowCount/(blueCount+greenCount+yellowCount))*100, color: "#F59E0B" },
+    ]
+    setCreditTypeData(data)
+  },[projects])
+  const projectsss = [
     {
       id: 1,
       name: "Urban Tree Planting Initiative",
@@ -46,7 +117,7 @@ const OrganizationDashboard = () => {
       location: "São Paulo, Brazil",
       lastUpdate: "2024-01-15",
       creditsIssued: 2450,
-      description: "Large-scale urban reforestation project"
+      description: "Large-scale urban reforestation project",
     },
     {
       id: 2,
@@ -56,7 +127,7 @@ const OrganizationDashboard = () => {
       location: "Mumbai, India",
       lastUpdate: "2024-01-12",
       creditsIssued: 1800,
-      description: "Residential solar panel deployment"
+      description: "Residential solar panel deployment",
     },
     {
       id: 3,
@@ -66,7 +137,7 @@ const OrganizationDashboard = () => {
       location: "Mombasa, Kenya",
       lastUpdate: "2024-01-10",
       creditsIssued: 0,
-      description: "Marine ecosystem restoration"
+      description: "Marine ecosystem restoration",
     },
     {
       id: 4,
@@ -76,7 +147,7 @@ const OrganizationDashboard = () => {
       location: "Texas, USA",
       lastUpdate: "2024-01-08",
       creditsIssued: 5200,
-      description: "Renewable energy generation project"
+      description: "Renewable energy generation project",
     },
     {
       id: 5,
@@ -86,73 +157,97 @@ const OrganizationDashboard = () => {
       location: "Pacific Ocean",
       lastUpdate: "2024-01-05",
       creditsIssued: 0,
-      description: "Marine plastic waste removal"
-    }
+      description: "Marine plastic waste removal",
+    },
   ];
 
   const creditsTrendData = [
-    { month: 'Jan', credits: 1200 },
-    { month: 'Feb', credits: 1800 },
-    { month: 'Mar', credits: 2400 },
-    { month: 'Apr', credits: 2100 },
-    { month: 'May', credits: 2800 },
-    { month: 'Jun', credits: 3200 },
-    { month: 'Jul', credits: 2900 },
-    { month: 'Aug', credits: 3400 },
-    { month: 'Sep', credits: 3800 },
-    { month: 'Oct', credits: 4200 },
-    { month: 'Nov', credits: 3900 },
-    { month: 'Dec', credits: 4500 }
+    { month: "Jan", credits: 1200 },
+    { month: "Feb", credits: 1800 },
+    { month: "Mar", credits: 2400 },
+    { month: "Apr", credits: 2100 },
+    { month: "May", credits: 2800 },
+    { month: "Jun", credits: 3200 },
+    { month: "Jul", credits: 2900 },
+    { month: "Aug", credits: 3400 },
+    { month: "Sep", credits: 3800 },
+    { month: "Oct", credits: 4200 },
+    { month: "Nov", credits: 3900 },
+    { month: "Dec", credits: 4500 },
   ];
 
-  const creditTypeData = [
-    { name: 'Blue Credits', value: 35, color: '#3B82F6' },
-    { name: 'Green Credits', value: 45, color: '#10B981' },
-    { name: 'Yellow Credits', value: 20, color: '#F59E0B' }
-  ];
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case 'verified': return 'success';
-      case 'under-review': return 'warning';
-      case 'submitted': return 'info';
-      case 'rejected': return 'destructive';
-      default: return 'secondary';
+      case "verified":
+        return "success";
+      case "pending":
+        return "warning";
+      case "submitted":
+        return "info";
+      case "rejected":
+        return "destructive";
+      default:
+        return "secondary";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'verified': return <CheckCircle className="h-4 w-4" />;
-      case 'under-review': return <Clock className="h-4 w-4" />;
-      case 'submitted': return <AlertCircle className="h-4 w-4" />;
-      case 'rejected': return <XCircle className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
+      case "verified":
+        return <CheckCircle className="h-4 w-4" />;
+      case "pending":
+        return <Clock className="h-4 w-4" />;
+      case "submitted":
+        return <AlertCircle className="h-4 w-4" />;
+      case "rejected":
+        return <XCircle className="h-4 w-4" />;
+      default:
+        return <Clock className="h-4 w-4" />;
     }
   };
 
   const getCreditTypeColor = (type: string) => {
     switch (type) {
-      case 'Blue': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'Green': return 'bg-green-100 text-green-800 border-green-200';
-      case 'Yellow': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case "blue":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "green":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "yellow":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
-  const filteredProjects = projects.filter(project => {
-    const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         project.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
-    const matchesType = typeFilter === 'all' || project.type === typeFilter;
-    
+  const filteredProjects = projects?.filter((project) => {
+    const matchesSearch =
+      project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.location?.address.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || project.verificationStatus === statusFilter;
+    const matchesType = typeFilter === "all" || project.projectType === typeFilter;
+
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const totalCredits = projects.reduce((sum, project) => sum + project.creditsIssued, 0);
-  const verifiedProjects = projects.filter(p => p.status === 'verified').length;
-  const verificationRate = (verifiedProjects / projects.length * 100).toFixed(1);
-  const pendingCredits = projects.filter(p => p.status === 'under-review' || p.status === 'submitted').length;
+
+  const totalCredits = projects?.reduce(
+    (sum, project) => sum + (project.proposedCredit || 0 ),
+    0
+  );
+  console.log(totalCredits)
+  const verifiedProjects = projects?.filter(
+    (p) => p.status === "verified"
+  ).length;
+  const verificationRate = ((verifiedProjects / projects.length) * 100).toFixed(
+    1
+  );
+  const pendingCredits = projects?.filter(
+    (p) => p.status === "pending" || p.status === "submitted"
+  ).length;
+
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -166,7 +261,9 @@ const OrganizationDashboard = () => {
                   <Leaf className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-foreground">EcoCredit MRV</h1>
+                  <h1 className="text-xl font-bold text-foreground">
+                    EcoCredit MRV
+                  </h1>
                   <p className="text-sm text-muted-foreground">Dashboard</p>
                 </div>
               </div>
@@ -195,8 +292,12 @@ const OrganizationDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Active Projects</p>
-                  <p className="text-3xl font-bold text-foreground">{projects.length}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Active Projects
+                  </p>
+                  <p className="text-3xl font-bold text-foreground">
+                    {projects.length}
+                  </p>
                 </div>
                 <div className="p-3 bg-primary/10 rounded-full">
                   <TreePine className="h-6 w-6 text-primary" />
@@ -209,8 +310,12 @@ const OrganizationDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Credits Earned</p>
-                  <p className="text-3xl font-bold text-foreground">{totalCredits.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Total Credits Earned
+                  </p>
+                  <p className="text-3xl font-bold text-foreground">
+                    {totalCredits.toLocaleString()}
+                  </p>
                 </div>
                 <div className="p-3 bg-success/10 rounded-full">
                   <Award className="h-6 w-6 text-success" />
@@ -223,8 +328,12 @@ const OrganizationDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">MRV Verification Rate</p>
-                  <p className="text-3xl font-bold text-foreground">{verificationRate}%</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    MRV Verification Rate
+                  </p>
+                  <p className="text-3xl font-bold text-foreground">
+                    {verificationRate}%
+                  </p>
                 </div>
                 <div className="p-3 bg-info/10 rounded-full">
                   <CheckCircle className="h-6 w-6 text-info" />
@@ -237,8 +346,12 @@ const OrganizationDashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Credits Pending</p>
-                  <p className="text-3xl font-bold text-foreground">{pendingCredits}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Credits Pending
+                  </p>
+                  <p className="text-3xl font-bold text-foreground">
+                    {pendingCredits}
+                  </p>
                 </div>
                 <div className="p-3 bg-warning/10 rounded-full">
                   <Clock className="h-6 w-6 text-warning" />
@@ -292,14 +405,19 @@ const OrganizationDashboard = () => {
                         className="pl-9 w-64"
                       />
                     </div>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <Select
+                      value={statusFilter}
+                      onValueChange={setStatusFilter}
+                    >
                       <SelectTrigger className="w-32">
                         <SelectValue placeholder="Status" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Status</SelectItem>
                         <SelectItem value="verified">Verified</SelectItem>
-                        <SelectItem value="under-review">Under Review</SelectItem>
+                        <SelectItem value="under-review">
+                          Under Review
+                        </SelectItem>
                         <SelectItem value="submitted">Submitted</SelectItem>
                         <SelectItem value="rejected">Rejected</SelectItem>
                       </SelectContent>
@@ -336,35 +454,46 @@ const OrganizationDashboard = () => {
                       <TableRow key={project.id} className="hover:bg-muted/50">
                         <TableCell>
                           <div>
-                            <p className="font-medium">{project.name}</p>
-                            <p className="text-sm text-muted-foreground">{project.description}</p>
+                            <p className="font-medium">{project.projectName}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {project?.projectName}
+                            </p>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getCreditTypeColor(project.type)}`}>
-                            {project.type}
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getCreditTypeColor(
+                              project.projectType
+                            )}`}
+                          >
+                            {project.projectType}
                           </span>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={getStatusVariant(project.status)} className="flex items-center gap-1 w-fit">
-                            {getStatusIcon(project.status)}
-                            {project.status.charAt(0).toUpperCase() + project.status.slice(1).replace('-', ' ')}
+                          <Badge
+                            variant={getStatusVariant(project.verificationStatus)}
+                            className="flex items-center gap-1 w-fit"
+                          >
+                            {getStatusIcon(project.verificationStatus)}
+                            {project.verificationStatus}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1 text-sm">
                             <MapPin className="h-3 w-3" />
-                            {project.location}
+                            {project.location?.address}
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1 text-sm">
                             <Calendar className="h-3 w-3" />
-                            {project.lastUpdate}
+                            {project.updatedAt}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <span className="font-medium">{project.creditsIssued.toLocaleString()}</span>
+                          <span className="font-medium">
+                            {project?.proposedCredit || 0}
+                          </span>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
@@ -401,7 +530,12 @@ const OrganizationDashboard = () => {
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="credits" stroke="hsl(var(--primary))" strokeWidth={2} />
+                    <Line
+                      type="monotone"
+                      dataKey="credits"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -436,9 +570,15 @@ const OrganizationDashboard = () => {
                 </ResponsiveContainer>
                 <div className="mt-4 space-y-2">
                   {creditTypeData.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between text-sm">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between text-sm"
+                    >
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: item.color }}
+                        ></div>
                         <span>{item.name}</span>
                       </div>
                       <span className="font-medium">{item.value}%</span>
@@ -472,4 +612,4 @@ const OrganizationDashboard = () => {
   );
 };
 
-export default OrganizationDashboard
+export default OrganizationDashboard;

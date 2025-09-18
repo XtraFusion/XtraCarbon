@@ -64,7 +64,8 @@ export interface INGOProjectSubmission extends Document {
   contactEmail: string;
   contactPhone: string;
   projectType: 'blue' | 'green' | 'yellow';
-  
+  proposedCredit:Number;
+  issuedCredit?:Number;
   // Location and area
   location: ILocation;
   landArea: number;
@@ -204,6 +205,15 @@ const NGOProjectSubmissionSchema = new Schema<INGOProjectSubmission>({
   landArea: {
     type: Number,
     required: true,
+    min: 0
+  },
+  proposedCredit: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  issuedCredit: {
+    type: Number,
     min: 0
   },
   landAreaUnit: {

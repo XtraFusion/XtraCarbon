@@ -36,6 +36,7 @@ interface NGOFormData {
   imagesList: Object[];
   // Project Type
   projectType: string;
+  proposedCredit:Number;
 
   // Monitoring Data
   monitoringStartDate: string;
@@ -96,6 +97,7 @@ export default function NGOProjectSubmissionPage() {
     monitoringEndDate: "",
     dataCollectionMethod: "",
     dataSources: "",
+    proposedCredit:0,
     collectionFrequency: "",
     satelliteImages: null,
     droneImages: null,
@@ -405,6 +407,25 @@ export default function NGOProjectSubmissionPage() {
                     name="projectLocation"
                     type="text"
                     value={formData.projectLocation}
+                    onChange={handleInputChange}
+                    className="w-full rounded-md px-3 py-2"
+                    style={inputStyle}
+                    placeholder="City, State/Province, Country"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="proposedCredit"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Propose Credit *
+                  </label>
+                  <input
+                    required
+                    id="proposedCredit"
+                    name="proposedCredit"
+                    type="number"
+                    value={formData.proposedCredit.toString()}
                     onChange={handleInputChange}
                     className="w-full rounded-md px-3 py-2"
                     style={inputStyle}
