@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Validate the form data
-    console.log(body)
+    console.log("body",body)
     // const validatedData = NGOFormSubmissionSchema.parse(body);
     
     // Create the project submission

@@ -212,7 +212,7 @@ export default function NGOProjectSubmissionPage() {
       imagesList: imagesList,
     }));
     console.log("NGO Form Data:", formData);
-    const data = await axios.post("/api/projects", { data: formData });
+    const data = await axios.post("/api/projects", { data: {...formData,imagesList:imagesList} });
     // router.push("/org/dashboard");
   }
 
