@@ -128,12 +128,6 @@ loadProjectData();
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [selectedProject, setSelectedProject] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showActionForm, setShowActionForm] = useState(false);
-  const [actionType, setActionType] = useState('');
-  const [actionMessage, setActionMessage] = useState('');
-  const [issuedCredit, setIssuedCredit] = useState('');
-  const [creditVintage, setCreditVintage] = useState('');
-  const [submitting, setSubmitting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState('submissionDate');
   const [sortDirection, setSortDirection] = useState('desc');
@@ -290,32 +284,10 @@ loadProjectData();
     setShowModal(true);
   };
 
-  const openAction = (type) => {
-    setActionType(type);
-    setActionMessage('');
-    setIssuedCredit('');
-    setCreditVintage('');
-    setShowActionForm(true);
-  };
-
-  const submitAction = async () => {
-    if (!selectedProject?._id) return;
-    try {
-      setSubmitting(true);
-      const payload = { action: actionType, message: actionMessage };
-      if (actionType === 'approve' || actionType === 'confirm') {
-        payload.issuedCredit = issuedCredit;
-        payload.creditVintage = creditVintage;
-      }
-      await axios.put(`/api/projects/${selectedProject._id}`, payload);
-      await loadProjectData();
-      setShowActionForm(false);
-      setShowModal(false);
-    } catch (e) {
-      console.error('Failed to submit action', e);
-    } finally {
-      setSubmitting(false);
-    }
+  const handleVerifierAction = (action, comments = '') => {
+    // In real app, this would make API call
+    console.log(`${action} project ${selectedProject.id}:`, comments);
+    setShowModal(false);
   };
 
   // Pagination
@@ -739,105 +711,25 @@ loadProjectData();
                 Close
               </button>
               <button
-                onClick={(e) => { e.stopPropagation(); openAction('reject'); }}
+                onClick={() => handleVerifierAction('reject')}
                 className="flex items-center space-x-2 px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors"
               >
                 <XCircle className="w-4 h-4" />
                 <span>Reject</span>
               </button>
               <button
-                onClick={(e) => { e.stopPropagation(); openAction('request_changes'); }}
+                onClick={() => handleVerifierAction('request_changes')}
                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 bg-yellow-100 border border-yellow-300 rounded-md hover:bg-yellow-200 transition-colors"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>Request Changes</span>
               </button>
               <button
-                onClick={(e) => { e.stopPropagation(); openAction('approve'); }}
+                onClick={() => handleVerifierAction('approve')}
                 className="flex items-center space-x-2 px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
               >
                 <CheckCircle className="w-4 h-4" />
                 <span>Approve & Verify</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {showActionForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-xl overflow-hidden">
-            <div className="flex justify-between items-center p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {actionType === 'reject' && 'Reject Project'}
-                {actionType === 'request_changes' && 'Send Back to NGO'}
-                {(actionType === 'approve' || actionType === 'confirm') && 'Approve & Issue Credits'}
-              </h3>
-              <button
-                onClick={() => setShowActionForm(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <XCircle className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Message (optional)</label>
-                <textarea
-                  className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  rows={4}
-                  placeholder={actionType === 'request_changes' ? 'Explain required changes for the NGO...' : 'Add any notes...'}
-                  value={actionMessage}
-                  onChange={(e) => setActionMessage(e.target.value)}
-                />
-              </div>
-              {(actionType === 'approve' || actionType === 'confirm') && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Issued Credits (tCO2e)</label>
-                    <input
-                      type="number"
-                      min="0"
-                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="e.g., 10000"
-                      value={issuedCredit}
-                      onChange={(e) => setIssuedCredit(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Credit Vintage (year)</label>
-                    <input
-                      type="number"
-                      min="2020"
-                      max="2030"
-                      className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="e.g., 2024"
-                      value={creditVintage}
-                      onChange={(e) => setCreditVintage(e.target.value)}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="flex justify-end space-x-3 p-6 border-t bg-gray-50">
-              <button
-                onClick={() => setShowActionForm(false)}
-                className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-                disabled={submitting}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={submitAction}
-                disabled={submitting || ((actionType === 'approve' || actionType === 'confirm') && !issuedCredit)}
-                className={`px-4 py-2 text-white rounded-md ${
-                  actionType === 'reject'
-                    ? 'bg-red-600 hover:bg-red-700'
-                    : actionType === 'request_changes'
-                      ? 'bg-yellow-600 hover:bg-yellow-700'
-                      : 'bg-green-600 hover:bg-green-700'
-                } disabled:opacity-60 disabled:cursor-not-allowed`}
-              >
-                {submitting ? 'Submitting...' : 'Submit'}
               </button>
             </div>
           </div>

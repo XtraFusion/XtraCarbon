@@ -28,6 +28,9 @@ const ProjectDetailsPage = () => {
   const [projectUser,setProjectUser] = useState<any>(null)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [issuedCredit, setIssuedCredit] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -44,6 +47,28 @@ const ProjectDetailsPage = () => {
     };
     if (id) fetchProject();
   }, [id]);
+
+  const performAction = async (action: 'confirm'|'reject'|'send_back'|'start') => {
+    try {
+      setActionLoading(action);
+      const payload: any = { action };
+      if (action === 'confirm') {
+        payload.issuedCredit = Number(issuedCredit || 0);
+        payload.message = message || undefined;
+      }
+      if (action === 'reject' || action === 'send_back') {
+        payload.message = message || undefined;
+      }
+      const res = await axios.patch(`/api/projects/${id}`, payload);
+      setProject(res.data.data);
+      setMessage("");
+      setIssuedCredit("");
+    } catch (e: any) {
+      alert(e?.response?.data?.error || 'Action failed');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const allDocs: MediaItem[] = useMemo(() => {
     const docs: MediaItem[] = [];
@@ -107,6 +132,59 @@ const ProjectDetailsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
           {/* Left: Primary Details */}
           <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white border rounded-lg p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Verification Actions</h2>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={() => performAction('start')}
+                    disabled={actionLoading !== null}
+                    className="px-3 py-2 rounded bg-gray-100 text-gray-800 hover:bg-gray-200 disabled:opacity-50"
+                  >
+                    {actionLoading === 'start' ? 'Starting…' : 'Start Review'}
+                  </button>
+                  <button
+                    onClick={() => performAction('reject')}
+                    disabled={actionLoading !== null}
+                    className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+                  >
+                    {actionLoading === 'reject' ? 'Rejecting…' : 'Reject'}
+                  </button>
+                  <button
+                    onClick={() => performAction('send_back')}
+                    disabled={actionLoading !== null}
+                    className="px-3 py-2 rounded bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50"
+                  >
+                    {actionLoading === 'send_back' ? 'Sending…' : 'Send Back to NGO'}
+                  </button>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      placeholder="Issued credits"
+                      value={issuedCredit}
+                      onChange={(e) => setIssuedCredit(e.target.value)}
+                      className="border rounded px-2 py-1 text-sm"
+                    />
+                    <button
+                      onClick={() => performAction('confirm')}
+                      disabled={actionLoading !== null}
+                      className="px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
+                    >
+                      {actionLoading === 'confirm' ? 'Confirming…' : 'Confirm Verification'}
+                    </button>
+                  </div>
+                </div>
+                <textarea
+                  placeholder="Optional message to NGO (for rejection or send back)"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="border rounded p-2 text-sm min-h-20"
+                />
+                <div className="text-xs text-gray-500">
+                  Current status: {project.verificationStatus || project.submissionStatus}
+                </div>
+              </div>
+            </div>
             <div className="bg-white border rounded-lg p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Overview</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

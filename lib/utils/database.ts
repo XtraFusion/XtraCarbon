@@ -257,6 +257,62 @@ export class NGOProjectService {
 
     return await NGOProjectSubmission.findByIdAndUpdate(id, updateData, { new: true });
   }
+
+  static async applyVerifierAction(params: {
+    projectId: string;
+    verifierId: string;
+    action: 'confirm' | 'reject' | 'send_back' | 'start';
+    issuedCredit?: number;
+    message?: string;
+  }) {
+    await ensureDBConnection();
+    const { projectId, verifierId, action, issuedCredit, message } = params;
+
+    const project = await NGOProjectSubmission.findById(projectId);
+    if (!project) return null;
+
+    const update: any = {};
+
+    update.verifierId = verifierId;
+
+    if (action === 'start') {
+      update.verificationStatus = 'in_progress';
+    }
+
+    if (action === 'reject') {
+      update.submissionStatus = 'rejected';
+      update.verificationStatus = 'rejected';
+      update.reviewComments = message || 'Rejected by verifier';
+      update.reviewDate = new Date();
+    }
+
+    if (action === 'send_back') {
+      update.submissionStatus = 'requires_revision';
+      update.verificationStatus = 'pending';
+      update.reviewComments = message || 'Changes requested by verifier';
+      update.reviewDate = new Date();
+    }
+
+    if (action === 'confirm') {
+      if (typeof issuedCredit !== 'number' || issuedCredit < 0) {
+        throw new Error('issuedCredit must be a non-negative number');
+      }
+      update.verificationStatus = 'verified';
+      update.submissionStatus = 'approved';
+      update.verifiedCarbonCredits = issuedCredit;
+      update.issuedCredit = issuedCredit;
+      update.verificationDate = new Date();
+      if (message) update.reviewComments = message;
+    }
+
+    const updated = await NGOProjectSubmission.findByIdAndUpdate(
+      projectId,
+      update,
+      { new: true }
+    );
+
+    return updated;
+  }
 }
 
 // Verifier Submission operations
