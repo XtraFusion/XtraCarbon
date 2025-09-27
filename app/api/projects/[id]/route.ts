@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { NGOProjectService } from "@/lib/utils/database";
 import { auth } from "@clerk/nextjs/server";
-import { User } from "@/lib/models";
+import { User, NGOProjectSubmission } from "@/lib/models";
 
 // GET /api/projects/[id] - Get a single project by ID
 export async function GET(
@@ -49,19 +49,39 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    // Expected body: { action: 'confirm'|'reject'|'send_back'|'start' , issuedCredit?, message? }
-    const { action, issuedCredit, message } = body || {};
-    if (!action) {
-      return NextResponse.json({ error: "Missing action" }, { status: 400 });
-    }
+    // Two modes:
+    // 1) Verifier actions: { action: 'confirm'|'reject'|'send_back'|'start', issuedCredit?, message? }
+    // 2) Edit submission: { updates: Partial<NGOProject>, setReapply?: boolean }
 
-    const updated = await NGOProjectService.applyVerifierAction({
-      projectId: id,
-      verifierId: userId,
-      action,
-      issuedCredit,
-      message
-    });
+    const { action, issuedCredit, message, updates, setReapply } = body || {};
+
+    let updated;
+    if (action) {
+      updated = await NGOProjectService.applyVerifierAction({
+        projectId: id,
+        verifierId: userId,
+        action,
+        issuedCredit,
+        message,
+      });
+    } else if (updates && typeof updates === "object") {
+      // Generic update path for editing submissions by the submitter
+      const nextUpdate: any = { ...updates };
+      if (setReapply) {
+        // Map requested 'reapply' to schema's allowed status
+        nextUpdate.submissionStatus = "submitted"; // treated as re-apply for review
+        nextUpdate.verificationStatus = "pending";
+        // Clear previous review metadata if any
+        nextUpdate.reviewComments = undefined;
+        nextUpdate.reviewDate = undefined;
+      }
+
+      updated = await NGOProjectSubmission.findByIdAndUpdate(id, nextUpdate, {
+        new: true,
+      });
+    } else {
+      return NextResponse.json({ error: "Missing action or updates" }, { status: 400 });
+    }
 
     if (!updated) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });

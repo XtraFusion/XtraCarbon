@@ -25,6 +25,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   TreePine,
@@ -62,52 +70,72 @@ import {
   Cell,
 } from "recharts";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+type Project = {
+  _id: string;
+  projectName: string;
+  projectType: string;
+  verificationStatus?: string;
+  submissionStatus?: string;
+  reviewComments?: string;
+  location?: { address?: string };
+  updatedAt?: string;
+  issuedCredit?: number;
+  proposedCredit?: number;
+};
 
 const OrganizationDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const router = useRouter();
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [viewingProject, setViewingProject] = useState<Project | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editProposedCredit, setEditProposedCredit] = useState<number>(0);
 
   async function loadProjectData() {
     const data = await axios.get("/api/projects/user");
     // console.log(data.data.data);
-    setProjects(data.data.data)
+    setProjects(data.data.data);
   }
   useEffect(() => {
     loadProjectData();
   }, []);
-  const [creditTypeData,setCreditTypeData] =useState([
+  const [creditTypeData, setCreditTypeData] = useState([
     { name: "Blue Credits", value: 35, color: "#3B82F6" },
     { name: "Green Credits", value: 45, color: "#10B981" },
     { name: "Yellow Credits", value: 20, color: "#F59E0B" },
-  ]) ;
-  useEffect(()=>{
-    let blueCount=0;
-    let greenCount=0;
-    let yellowCount=0;
-    for(let i=0;i<projects.length;i++){
-          if(projects[i].projectType=="blue"){
-            blueCount++;
-          }
-          else if(projects[i].projectType=="yellow"){
-            yellowCount++;
-          }
-          else if(projects[i].projectType=="green"){
-            greenCount++;
-          }
-          else{
-
-          }
+  ] as { name: string; value: number; color: string }[]);
+  useEffect(() => {
+    let blueCount = 0;
+    let greenCount = 0;
+    let yellowCount = 0;
+    for (let i = 0; i < projects.length; i++) {
+      if (projects[i].projectType == "blue") {
+        blueCount++;
+      } else if (projects[i].projectType == "yellow") {
+        yellowCount++;
+      } else if (projects[i].projectType == "green") {
+        greenCount++;
+      } else {
+      }
     }
 
-    const data =[
-      { name: "Blue Credits", value: (blueCount/(blueCount+greenCount+yellowCount))*100, color: "#3B82F6" },
-      { name: "Green Credits", value: (greenCount/(blueCount+greenCount+yellowCount))*100, color: "#10B981" },
-      { name: "Yellow Credits", value: (yellowCount/(blueCount+greenCount+yellowCount))*100, color: "#F59E0B" },
-    ]
-    setCreditTypeData(data)
-  },[projects])
+    const total = blueCount + greenCount + yellowCount || 1;
+    const toPercent = (n: number) => Math.round((n / total) * 100 * 100) / 100;
+    const data = [
+      { name: "Blue Credits", value: toPercent(blueCount), color: "#3B82F6" },
+      { name: "Green Credits", value: toPercent(greenCount), color: "#10B981" },
+      { name: "Yellow Credits", value: toPercent(yellowCount), color: "#F59E0B" },
+    ];
+    setCreditTypeData(data);
+  }, [projects]);
   const projectsss = [
     {
       id: 1,
@@ -176,15 +204,14 @@ const OrganizationDashboard = () => {
     { month: "Dec", credits: 4500 },
   ];
 
-
-  const getStatusVariant = (status: string) => {
+  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
       case "verified":
-        return "success";
+        return "default";
       case "pending":
-        return "warning";
+        return "outline";
       case "submitted":
-        return "info";
+        return "secondary";
       case "rejected":
         return "destructive";
       default:
@@ -223,31 +250,33 @@ const OrganizationDashboard = () => {
   const filteredProjects = projects?.filter((project) => {
     const matchesSearch =
       project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.location?.address.toLowerCase().includes(searchTerm.toLowerCase());
+      ((project.location?.address || "").toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus =
       statusFilter === "all" || project.verificationStatus === statusFilter;
-    const matchesType = typeFilter === "all" || project.projectType === typeFilter;
+    const matchesType =
+      typeFilter === "all" || project.projectType === typeFilter;
 
     return matchesSearch && matchesStatus && matchesType;
   });
 
-
   const totalCredits = projects?.reduce(
-    (sum, project) => sum + (project.proposedCredit || 0 ),
+    (sum, project) => sum + (project.issuedCredit || 0),
     0
   );
-  console.log(totalCredits)
-  const verifiedProjects = projects?.filter(
-    (p) => p.status === "verified"
-  ).length;
-  const verificationRate = ((verifiedProjects / projects.length) * 100).toFixed(
-    1
+  const proposedCredit = projects?.reduce(
+    (sum, project) => sum + (project.proposedCredit || 0),
+    0
   );
-  const pendingCredits = projects?.filter(
-    (p) => p.status === "pending" || p.status === "submitted"
+  console.log(totalCredits);
+  const verifiedProjects = projects?.filter(
+    (p) => p.verificationStatus === "verified"
   ).length;
-
-
+  const verificationRate = projects.length
+    ? ((verifiedProjects / projects.length) * 100).toFixed(1)
+    : "0.0";
+  const pendingCredits = projects?.filter(
+    (p) => p.verificationStatus === "pending" || p.verificationStatus === "submitted"
+  ).length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -262,7 +291,7 @@ const OrganizationDashboard = () => {
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-foreground">
-                    EcoCredit MRV
+                    XtraCarbon MRV
                   </h1>
                   <p className="text-sm text-muted-foreground">Dashboard</p>
                 </div>
@@ -350,7 +379,7 @@ const OrganizationDashboard = () => {
                     Credits Pending
                   </p>
                   <p className="text-3xl font-bold text-foreground">
-                    {pendingCredits}
+                    {proposedCredit}
                   </p>
                 </div>
                 <div className="p-3 bg-warning/10 rounded-full">
@@ -374,9 +403,9 @@ const OrganizationDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button variant="gradient" className="h-auto p-4 flex-col">
+                  <Button variant="default" className="h-auto p-4 flex-col">
                     <Plus className="h-6 w-6 mb-2" />
-                    <span className="font-semibold">Add New Project</span>
+                    <Link href={"/submit/project/ngo"} className="font-semibold">Add New Project</Link>
                   </Button>
                   <Button variant="outline" className="h-auto p-4 flex-col">
                     <Award className="h-6 w-6 mb-2" />
@@ -451,13 +480,28 @@ const OrganizationDashboard = () => {
                   </TableHeader>
                   <TableBody>
                     {filteredProjects.map((project) => (
-                      <TableRow key={project.id} className="hover:bg-muted/50">
+                      <TableRow
+                        key={project._id}
+                        className={`hover:bg-muted/50 ${
+                          project.submissionStatus === "requires_revision"
+                            ? "bg-red-50"
+                            : ""
+                        }`}
+                      >
                         <TableCell>
                           <div>
                             <p className="font-medium">{project.projectName}</p>
                             <p className="text-sm text-muted-foreground">
                               {project?.projectName}
                             </p>
+                            {project.submissionStatus === "requires_revision" && (
+                              <div className="mt-1 text-sm text-red-600 flex items-start gap-1">
+                                <AlertCircle className="h-4 w-4 mt-0.5" />
+                                <span>
+                                  {project.reviewComments || "Revision required by reviewer."}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -471,10 +515,12 @@ const OrganizationDashboard = () => {
                         </TableCell>
                         <TableCell>
                           <Badge
-                            variant={getStatusVariant(project.verificationStatus)}
+                            variant={getStatusVariant(
+                              project.verificationStatus ?? ""
+                            )}
                             className="flex items-center gap-1 w-fit"
                           >
-                            {getStatusIcon(project.verificationStatus)}
+                            {getStatusIcon(project.verificationStatus ?? "")}
                             {project.verificationStatus}
                           </Badge>
                         </TableCell>
@@ -497,10 +543,26 @@ const OrganizationDashboard = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="sm">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setViewingProject(project);
+                                setIsViewOpen(true);
+                              }}
+                            >
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                console.log(project)
+                                if (project._id) {
+                                  router.push(`/submit/project/update/${project._id}`);
+                                }
+                              }}
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                           </div>
@@ -559,7 +621,9 @@ const OrganizationDashboard = () => {
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
-                      label={({ name, value }) => `${name}: ${value}%`}
+                      label={({ name, value }) =>
+                        `${name}: ${value}%`
+                      }
                     >
                       {creditTypeData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -581,7 +645,9 @@ const OrganizationDashboard = () => {
                         ></div>
                         <span>{item.name}</span>
                       </div>
-                      <span className="font-medium">{item.value}%</span>
+                      <span className="font-medium">
+                        {item.value}%
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -608,6 +674,156 @@ const OrganizationDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Edit Project Modal */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Project</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="projectName">Project Name</Label>
+              <Input
+                id="projectName"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="proposedCredit">Proposed Credit</Label>
+              <Input
+                id="proposedCredit"
+                type="number"
+                value={isNaN(editProposedCredit) ? "" : editProposedCredit}
+                onChange={(e) => setEditProposedCredit(parseFloat(e.target.value))}
+              />
+            </div>
+            {editingProject?.submissionStatus === "requires_revision" && (
+              <div className="text-xs text-muted-foreground">
+                Changes will set SubmissionStatus to reapply.
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setIsEditOpen(false);
+                setEditingProject(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                if (!editingProject?._id) return;
+                try {
+                  await axios.patch(`/api/projects/${editingProject._id}`, {
+                    updates: {
+                      projectName: editName,
+                      proposedCredit: Number(editProposedCredit) || 0,
+                    },
+                    setReapply: true,
+                  });
+                  await loadProjectData();
+                  setIsEditOpen(false);
+                  setEditingProject(null);
+                } catch (err) {
+                  console.error("Failed to update project", err);
+                }
+              }}
+            >
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Documents Modal */}
+      <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Related Files</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            {(() => {
+              const filesFrom = (src: any): { url: string; label: string; isImage: boolean }[] => {
+                if (!src) return [];
+                const arr = Array.isArray(src) ? src : [src];
+                return arr
+                  .map((item: any, idx: number) => {
+                    const url =
+                      (typeof item === "string" && item) ||
+                      item?.url ||
+                      item?.downloadUrl ||
+                      item?.href ||
+                      item?.path ||
+                      "";
+                    if (!url) return null;
+                    const isImage = /\.(png|jpg|jpeg|gif|webp|tif|tiff)$/i.test(url);
+                    const label = item?.name || `file-${idx + 1}`;
+                    return { url, label, isImage };
+                  })
+                  .filter(Boolean) as { url: string; label: string; isImage: boolean }[];
+              };
+
+              const sections: { title: string; items: { url: string; label: string; isImage: boolean }[] }[] = [
+                { title: "Images List", items: filesFrom(viewingProject?.imagesList) },
+                { title: "Field Survey Reports", items: filesFrom((viewingProject as any)?.fieldSurveyReports) },
+                { title: "Additional Evidence", items: filesFrom((viewingProject as any)?.additionalEvidence) },
+                { title: "Blue Carbon • Satellite Images", items: filesFrom((viewingProject as any)?.blueCarbonData?.satelliteImages) },
+                { title: "Blue Carbon • Geotagged Photos", items: filesFrom((viewingProject as any)?.blueCarbonData?.geotaggedPhotos) },
+                { title: "Green Carbon • Drone Images", items: filesFrom((viewingProject as any)?.greenCarbonData?.droneImages) },
+                { title: "Green Carbon • Geotagged Photos", items: filesFrom((viewingProject as any)?.greenCarbonData?.geotaggedPhotos) },
+                { title: "Yellow Carbon • Satellite Images", items: filesFrom((viewingProject as any)?.yellowCarbonData?.satelliteImages) },
+                { title: "Yellow Carbon • Geotagged Photos", items: filesFrom((viewingProject as any)?.yellowCarbonData?.geotaggedPhotos) },
+                { title: "Map Polygon", items: filesFrom((viewingProject as any)?.mapPolygon) },
+              ];
+
+              return (
+                <div className="space-y-6">
+                  {sections
+                    .filter((s) => s.items.length > 0)
+                    .map((section, idx) => (
+                      <div key={idx} className="space-y-2">
+                        <h4 className="text-sm font-semibold text-foreground">{section.title}</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                          {section.items.map((f, i) => (
+                            <a
+                              key={i}
+                              href={f.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="border rounded-md p-2 hover:bg-muted/50"
+                            >
+                              {f.isImage ? (
+                                <img
+                                  src={f.url}
+                                  alt={f.label}
+                                  className="w-full h-28 object-cover rounded"
+                                />
+                              ) : (
+                                <div className="text-sm truncate">{f.label}</div>
+                              )}
+                              <div className="mt-1 text-xs text-muted-foreground truncate">{f.label}</div>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  {sections.every((s) => s.items.length === 0) && (
+                    <div className="text-sm text-muted-foreground">No related files found.</div>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setIsViewOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

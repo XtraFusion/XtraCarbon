@@ -48,6 +48,9 @@ export default function AreaSelector({
   setLocationError,
 }: {
   locationError: string;
+  isLocating: boolean;
+  setOpenMap: (open: boolean) => void;
+  setIsLocating: (locating: boolean) => void;
   setMapCenter: any;
   setAreaUnit: any;
   setAreaSize: any;

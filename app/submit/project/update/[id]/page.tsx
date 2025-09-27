@@ -17,7 +17,7 @@ const AreaSelector = dynamic(() => import("@/app/components/AreaSelector"), {
 import type React from "react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SatelliteImageryDashboard } from "@/app/satellite-dashboard/_components/SatelliteImageryDashboard";
 import { useFileUpload } from "@/lib/hooks/useFileUpload";
@@ -66,6 +66,8 @@ interface NGOFormData {
 
 export default function NGOProjectSubmissionPage() {
   const router = useRouter();
+  const params = useParams();
+  const projectId = (params as any)?.id as string | undefined;
   const fileUploader = useFileUpload();
   const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
   const [areaSize, setAreaSize] = useState<number>(1);
@@ -116,10 +118,72 @@ export default function NGOProjectSubmissionPage() {
     imagesList: [],
   });
 
-  // Load existing project for edit mode
+  // Existing files loaded from backend for preview
+  const [existingFiles, setExistingFiles] = useState<any>({
+    imagesList: [],
+    fieldSurveyReports: [],
+    additionalEvidence: [],
+    mapPolygon: [],
+    blue: { satelliteImages: [], geotaggedPhotos: [] },
+    green: { satelliteImages: [], geotaggedPhotos: [], droneImages: [] },
+    yellow: { satelliteImages: [], geotaggedPhotos: [] },
+  });
+
+  const filesFrom = (src: any): { url: string; label: string; isImage: boolean }[] => {
+    if (!src) return [];
+    const arr = Array.isArray(src) ? src : [src];
+    return arr
+      .map((item: any, idx: number) => {
+        const url =
+          (typeof item === "string" && item) ||
+          item?.url ||
+          item?.downloadUrl ||
+          item?.href ||
+          item?.path ||
+          "";
+        if (!url) return null;
+        const isImage = /\.(png|jpg|jpeg|gif|webp|tif|tiff)$/i.test(url);
+        const label = item?.name || `file-${idx + 1}`;
+        return { url, label, isImage };
+      })
+      .filter(Boolean) as { url: string; label: string; isImage: boolean }[];
+  };
+
+  const FilePreview = ({ items }: { items: { url: string; label: string; isImage: boolean }[] }) => {
+    if (!items || items.length === 0) return null;
+    return (
+      <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        {items.map((f, i) => (
+          (() => {
+            const lowerUrl = (f.url || "").toLowerCase();
+            const isDoc = /\.(pdf|doc|docx|ppt|pptx|xls|xlsx)$/i.test(lowerUrl);
+            const openUrl = !f.isImage && isDoc
+              ? `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(f.url)}`
+              : f.url;
+            return (
+              <a
+                key={i}
+                href={openUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="border rounded-md p-2 hover:bg-gray-50"
+              >
+            {f.isImage ? (
+              <img src={f.url} alt={f.label} className="w-full h-28 object-cover rounded" />
+            ) : (
+              <div className="text-sm truncate">{f.label}</div>
+            )}
+            <div className="mt-1 text-xs text-gray-500 truncate">{f.label}</div>
+              </a>
+            );
+          })()
+        ))}
+      </div>
+    );
+  };
+
+  // Load existing project for edit mode by route param id
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const editId = params.get("edit");
     async function loadForEdit(id: string) {
       try {
         const res = await axios.get(`/api/projects/${id}`);
@@ -140,18 +204,40 @@ export default function NGOProjectSubmissionPage() {
           monitoringStartDate: p.monitoringData?.startDate ? new Date(p.monitoringData.startDate).toISOString().slice(0,10) : "",
           monitoringEndDate: p.monitoringData?.endDate ? new Date(p.monitoringData.endDate).toISOString().slice(0,10) : "",
           dataCollectionMethod: p.monitoringData?.collectionMethod || "",
-          dataSources: p.monitoringData?.dataSources || "",
+          dataSources: Array.isArray(p.monitoringData?.dataSources)
+            ? p.monitoringData.dataSources.join(", ")
+            : (p.monitoringData?.dataSources || ""),
           collectionFrequency: p.monitoringData?.frequency || "",
           proposedCredit: Number(p.proposedCredit || 0),
           imagesList: Array.isArray(p.imagesList) ? p.imagesList : [],
           biomassData: p.greenCarbonData?.biomassData || "",
-          soilSampleDetails: p.yellowCarbonData?.soilSampleDetails || "",
+          soilSampleDetails: p.greenCarbonData?.soilSampleDetails || p.yellowCarbonData?.soilSampleDetails || "",
           sedimentCoreDetails: p.blueCarbonData?.sedimentCoreDetails || "",
           waterQualityParams: p.blueCarbonData?.waterQualityParams || "",
-          activityDescription: p.greenCarbonData?.activityDescription || p.yellowCarbonData?.activityDescription || "",
-          plantingDates: p.greenCarbonData?.plantingDates || "",
-          speciesPlanted: p.yellowCarbonData?.speciesPlanted || "",
+          activityDescription: p.yellowCarbonData?.activityDescription || "",
+          plantingDates: "",
+          speciesPlanted: p.greenCarbonData?.speciesPlanted || p.yellowCarbonData?.speciesPlanted || "",
         }));
+        // Normalize and store existing files for previews
+        setExistingFiles({
+          imagesList: filesFrom(p.imagesList),
+          fieldSurveyReports: filesFrom(p.fieldSurveyReports),
+          additionalEvidence: filesFrom(p.additionalEvidence),
+          mapPolygon: filesFrom(p.mapPolygon),
+          blue: {
+            satelliteImages: filesFrom(p.blueCarbonData?.satelliteImages),
+            geotaggedPhotos: filesFrom(p.blueCarbonData?.geotaggedPhotos),
+          },
+          green: {
+            satelliteImages: filesFrom(p.greenCarbonData?.satelliteImages),
+            geotaggedPhotos: filesFrom(p.greenCarbonData?.geotaggedPhotos),
+            droneImages: filesFrom(p.greenCarbonData?.droneImages),
+          },
+          yellow: {
+            satelliteImages: filesFrom(p.yellowCarbonData?.satelliteImages),
+            geotaggedPhotos: filesFrom(p.yellowCarbonData?.geotaggedPhotos),
+          },
+        });
         if (p.location?.latitude && p.location?.longitude) {
           setMapCenter({ lat: p.location.latitude, lng: p.location.longitude });
         }
@@ -159,10 +245,10 @@ export default function NGOProjectSubmissionPage() {
         console.error("Failed to load project for edit", e);
       }
     }
-    if (editId) {
-      loadForEdit(editId);
+    if (projectId) {
+      loadForEdit(projectId);
     }
-  }, []);
+  }, [projectId]);
 
   useEffect(() => {
     setFormData((prev) => ({
@@ -272,10 +358,7 @@ export default function NGOProjectSubmissionPage() {
     }));
     console.log("NGO Form Data:", formData);
 
-    const params = new URLSearchParams(window.location.search);
-    const editId = params.get("edit");
-
-    if (editId) {
+    if (projectId) {
       const updates: any = {
         projectName: formData.projectName,
         organizationName: formData.organizationName,
@@ -293,7 +376,9 @@ export default function NGOProjectSubmissionPage() {
           startDate: formData.monitoringStartDate ? new Date(formData.monitoringStartDate) : undefined,
           endDate: formData.monitoringEndDate ? new Date(formData.monitoringEndDate) : undefined,
           collectionMethod: formData.dataCollectionMethod,
-          dataSources: formData.dataSources,
+          dataSources: typeof formData.dataSources === "string"
+            ? formData.dataSources.split(",").map((s) => s.trim()).filter(Boolean)
+            : formData.dataSources,
           frequency: formData.collectionFrequency,
         },
         proposedCredit: Number(formData.proposedCredit || 0),
@@ -306,8 +391,9 @@ export default function NGOProjectSubmissionPage() {
         },
         greenCarbonData: {
           biomassData: formData.biomassData,
-          activityDescription: formData.activityDescription,
-          plantingDates: formData.plantingDates,
+          soilSampleDetails: formData.soilSampleDetails,
+          speciesPlanted: formData.speciesPlanted,
+          satelliteImages: satelliteImageUrl || undefined,
           droneImages: droneImagesUrl || undefined,
           geotaggedPhotos: geoTaggedPhotosUrl || undefined,
         },
@@ -322,17 +408,14 @@ export default function NGOProjectSubmissionPage() {
         additionalEvidence: additionalEvidenceUrl || undefined,
       };
 
-      await axios.patch(`/api/projects/${editId}`, {
+      await axios.patch(`/api/projects/${projectId}`, {
         updates,
         setReapply: true,
       });
       router.push("/org/dashboard");
       return;
     }
-
-    await axios.post("/api/projects", {
-      data: { ...formData, imagesList: imagesList },
-    });
+    // Fallback: if no id present, redirect back
     router.push("/org/dashboard");
   }
 
@@ -449,12 +532,9 @@ export default function NGOProjectSubmissionPage() {
       )}
       <div className="mx-auto max-w-4xl px-4 py-8">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-green-600">
-            NGO Project Submission
-          </h1>
+          <h1 className="text-3xl font-bold text-green-600">Update Project</h1>
           <p className="text-gray-600 mt-2">
-            Please fill all mandatory project details and upload supporting
-            materials for MRV verification.
+            Update your project details and resubmit for MRV verification.
           </p>
         </header>
 
@@ -772,6 +852,7 @@ export default function NGOProjectSubmissionPage() {
                   Upload GeoJSON, KML, Shapefile, or GPX files containing
                   project boundaries
                 </p>
+              <FilePreview items={existingFiles.mapPolygon} />
               </div>
             </div>
           )}
@@ -925,6 +1006,7 @@ export default function NGOProjectSubmissionPage() {
                     Upload satellite imagery and drone survey images (TIFF,
                     GeoTIFF preferred)
                   </p>
+                  <FilePreview items={existingFiles.blue.satelliteImages} />
                 </div>
 
                 <div>
@@ -949,6 +1031,7 @@ export default function NGOProjectSubmissionPage() {
                     Upload geotagged field photos and videos of coastal/marine
                     ecosystems
                   </p>
+                  <FilePreview items={existingFiles.blue.geotaggedPhotos} />
                 </div>
               </div>
 
@@ -1099,6 +1182,13 @@ export default function NGOProjectSubmissionPage() {
                     Upload satellite imagery and drone survey images (TIFF,
                     GeoTIFF preferred)
                   </p>
+                  <FilePreview
+                    items={
+                      existingFiles.green.satelliteImages && existingFiles.green.satelliteImages.length > 0
+                        ? existingFiles.green.satelliteImages
+                        : existingFiles.green.droneImages
+                    }
+                  />
                 </div>
 
                 <div>
@@ -1123,6 +1213,7 @@ export default function NGOProjectSubmissionPage() {
                     Upload geotagged field photos and videos of forest/grassland
                     ecosystems
                   </p>
+                  <FilePreview items={existingFiles.green.geotaggedPhotos} />
                 </div>
               </div>
 
@@ -1273,6 +1364,7 @@ export default function NGOProjectSubmissionPage() {
                     Upload satellite imagery of agricultural fields (TIFF,
                     GeoTIFF preferred)
                   </p>
+                  <FilePreview items={existingFiles.yellow.satelliteImages} />
                 </div>
 
                 <div>
@@ -1297,6 +1389,7 @@ export default function NGOProjectSubmissionPage() {
                     Upload photos showing farming practices, soil conditions,
                     crop rotations
                   </p>
+                  <FilePreview items={existingFiles.yellow.geotaggedPhotos} />
                 </div>
               </div>
 
@@ -1394,6 +1487,7 @@ export default function NGOProjectSubmissionPage() {
                     Upload field survey reports, third-party audit reports, and
                     documentation
                   </p>
+                  <FilePreview items={existingFiles.fieldSurveyReports} />
                 </div>
 
                 <div>
@@ -1418,7 +1512,14 @@ export default function NGOProjectSubmissionPage() {
                     Upload any additional supporting evidence, photos, videos,
                     or documents
                   </p>
+                  <FilePreview items={existingFiles.additionalEvidence} />
                 </div>
+                {existingFiles.imagesList?.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900">Previously Added Images</h3>
+                    <FilePreview items={existingFiles.imagesList} />
+                  </div>
+                )}
               </div>
             </div>
           )}
