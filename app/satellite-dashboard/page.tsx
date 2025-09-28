@@ -5,7 +5,7 @@ import { SatelliteImageryDashboard } from './_components/SatelliteImageryDashboa
 const Page = () => {
   return (
     <div>
-      <SatelliteImageryDashboard/>
+      {/* <SatelliteImageryDashboard imagesList={[]} setImagesList={}/> */}
     </div>
   )
 }
