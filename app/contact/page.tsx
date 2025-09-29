@@ -58,9 +58,9 @@ export default function ContactPage() {
               <CardTitle>Organization Info</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <p>EcoStack HQ</p>
+              <p>XtraCarbon HQ</p>
               <p>123 Greenway Blvd, Sustain City</p>
-              <p>Email: support@ecostack.org</p>
+              <p>Email: support@XtraCarbon.org</p>
               <p>Phone: +1 (555) 123-4567</p>
               <div className="flex gap-3 pt-2">
                 <a href="#" className="underline" style={{ color: "#1E3A8A" }} aria-label="Twitter">

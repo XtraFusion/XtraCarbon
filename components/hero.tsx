@@ -16,7 +16,7 @@ export function Hero() {
             Build eco‑friendly apps, fast.
           </h1>
           <p className="mt-4 text-pretty leading-relaxed">
-            Ship hackathon-ready projects with an infrastructure that respects the planet. EcoStack combines green
+            Ship hackathon-ready projects with an infrastructure that respects the planet. XtraCarbon combines green
             hosting insights, efficient tooling, and best practices to minimize your carbon footprint without
             sacrificing speed.
           </p>

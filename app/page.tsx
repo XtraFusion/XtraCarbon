@@ -16,7 +16,7 @@ export default function HomePage() {
         }}
       >
         <div className="mx-auto max-w-6xl px-4 py-8 text-center text-sm">
-          © {new Date().getFullYear()} EcoStack. All rights reserved.
+          © {new Date().getFullYear()} XtraCarbon. All rights reserved.
         </div>
       </footer>
     </main>
