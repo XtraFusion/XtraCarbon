@@ -65,7 +65,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       >
         <div
           ref={desktopToggleRef}
-          className="hidden md:block fixed z-50 cursor-move bg-[#F3F4F6]"
+          className="hidden md:block fixed z-50 cursor-move bg-[transparent]"
           style={{ top: 16, left: 16 }}
         >
           <button
