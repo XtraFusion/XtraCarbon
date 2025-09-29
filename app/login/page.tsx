@@ -60,7 +60,7 @@ export default function LoginPage() {
       } else if (data.user.role === 'admin') {
         router.push('/admin')
       } else {
-        router.push('/user/dashboard')
+        router.push('/buyer/dashboard')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')

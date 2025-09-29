@@ -20,7 +20,7 @@ export default function SignupPage() {
       } else if (role === "admin") {
         router.push("/admin");
       } else {
-        router.push("/user/dashboard");
+        router.push("/buyer/dashboardoard");
       }
     }
   }, [isSignedIn, user, selectedRole, router, syncing]);

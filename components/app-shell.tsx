@@ -21,7 +21,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       { href: "/", label: "Home" },
       { href: "/about", label: "About" },
       { href: "/org/dashboard", label: "Organization Dashboard" },
-      { href: "/user/dashboard", label: "User Dashboard" },
+      { href: "/buyer/dashboardoard", label: "User Dashboard" },
       { href: "/submit/project/ngo", label: "Submit Project" },
       { href: "/submit/action", label: "Submit Action" },
       { href: "/verifier/dashboard", label: "Verification Dashboard" },

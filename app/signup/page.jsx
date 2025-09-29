@@ -76,7 +76,7 @@ export default function SignupPage() {
       if (data.user.role === 'org') {
         router.push('/org/dashboard')
       } else {
-        router.push('/user/dashboard')
+        router.push('/buyer/dashboard')
       }
     } catch (err) {
       setError(err.message || 'An error occurred')
