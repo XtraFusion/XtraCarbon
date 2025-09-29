@@ -94,12 +94,12 @@ export default function Transactions() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Transaction History</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">Transaction History</h1>
           <p className="text-muted-foreground mt-2">
             Track all your carbon credit purchases, retirements, and transfers
           </p>
         </div>
-        <Button onClick={exportTransactions} className="gap-2">
+        <Button onClick={exportTransactions} className="gap-2 bg-gradient-to-r from-indigo-500 to-sky-500 hover:from-indigo-600 hover:to-sky-600">
           <Download className="h-4 w-4" />
           Export
         </Button>
@@ -107,10 +107,10 @@ export default function Transactions() {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="border-none bg-gradient-to-br from-sky-50 to-indigo-50 dark:from-sky-900/20 dark:to-indigo-900/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-4 w-4 text-sky-600 dark:text-sky-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -122,7 +122,7 @@ export default function Transactions() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-none bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Credits Purchased</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
@@ -137,7 +137,7 @@ export default function Transactions() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-none bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Credits Retired</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
@@ -152,7 +152,7 @@ export default function Transactions() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-none bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-900/20 dark:to-fuchsia-900/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -169,7 +169,7 @@ export default function Transactions() {
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="border-none bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/10 dark:to-teal-900/10">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className="relative">
@@ -209,13 +209,13 @@ export default function Transactions() {
             <Button
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="gap-2"
+              className="gap-2 bg-gradient-to-r from-indigo-500 to-sky-500 text-white hover:from-indigo-600 hover:to-sky-600 border-0"
             >
               <ArrowUpDown className="h-4 w-4" />
               {sortOrder === 'desc' ? 'Newest First' : 'Oldest First'}
             </Button>
 
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 border-0">
               <Filter className="h-4 w-4" />
               More Filters
             </Button>

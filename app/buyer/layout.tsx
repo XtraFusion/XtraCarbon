@@ -41,9 +41,9 @@ const navigation = [
 
 function BuyerSidebar() {
   const { state } = useSidebar();
-  const location = usePathname();
+  const currentPath = usePathname();
   
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => currentPath === path;
 
   return (
     <Sidebar className={state === "collapsed" ? "w-14" : "w-64"} collapsible="icon">
@@ -51,7 +51,7 @@ function BuyerSidebar() {
         <div className="p-4 border-b border-sidebar-border">
           {state !== "collapsed" && (
             <div>
-              <h2 className="text-lg font-semibold text-sidebar-foreground">
+              <h2 className="text-lg font-semibold bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">
                 Carbon Registry
               </h2>
               <p className="text-sm text-sidebar-foreground/70">
@@ -70,13 +70,11 @@ function BuyerSidebar() {
                   <SidebarMenuButton asChild>
                     <Link
                       href={item.href}
-                      className={({ isActive }) =>
-                        `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                          isActive
-                            ? 'bg-primary text-primary-foreground'
-                            : 'text-sidebar-foreground hover:bg-sidebar-accent'
-                        }`
-                      }
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                        isActive(item.href)
+                          ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white'
+                          : 'text-sidebar-foreground hover:bg-sidebar-accent'
+                      }`}
                     >
                       <item.icon className="h-5 w-5" />
                       {state !== "collapsed" && <span>{item.name}</span>}
@@ -116,7 +114,7 @@ export default function BuyerLayout({ children }: BuyerLayoutProps) {
           <header className="h-16 flex items-center justify-between px-6 border-b border-border bg-background">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="h-8 w-8" />
-              <h1 className="text-xl font-semibold text-foreground">
+              <h1 className="text-xl font-semibold bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">
                 Carbon Credit Registry
               </h1>
             </div>

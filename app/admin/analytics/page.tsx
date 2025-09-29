@@ -39,7 +39,7 @@ import {
 } from 'lucide-react';
 import { mockCreditsIssuedData, mockCreditsRetiredData, mockProjectTypeData, mockSystemStats } from '@/data/mockDataAdmin';
 
-const COLORS = ['hsl(var(--primary))', 'hsl(var(--success))', 'hsl(var(--warning))', 'hsl(var(--destructive))', 'hsl(var(--muted))'];
+const COLORS = ['hsl(var(--primary))', 'green', 'hsl(var(--warning))', 'hsl(var(--destructive))', 'hsl(var(--muted))'];
 
 // Additional mock data for analytics
 const monthlyTransactionData = [
@@ -87,7 +87,7 @@ export default function Analytics() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Analytics & Reporting</h1>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">Analytics & Reporting</h1>
             <p className="text-muted-foreground">
               System performance metrics and market insights
             </p>
@@ -113,10 +113,10 @@ export default function Analytics() {
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
+          <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-none shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">${(stats.monthlyTransactionValue / 1000000).toFixed(1)}M</div>
@@ -127,10 +127,10 @@ export default function Analytics() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-br from-sky-50 to-indigo-50 dark:from-sky-900/20 dark:to-indigo-900/20 border-none shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Credits Traded</CardTitle>
-              <CreditCard className="h-4 w-4 text-muted-foreground" />
+              <CreditCard className="h-4 w-4 text-sky-600 dark:text-sky-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{(stats.retiredCredits / 1000).toFixed(0)}K</div>
@@ -141,10 +141,10 @@ export default function Analytics() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-900/20 dark:to-fuchsia-900/20 border-none shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Participants</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <Users className="h-4 w-4 text-violet-600 dark:text-violet-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.activeUsers}</div>
@@ -155,10 +155,10 @@ export default function Analytics() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-none shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Avg. Credit Price</CardTitle>
-              <Leaf className="h-4 w-4 text-muted-foreground" />
+              <Leaf className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">$13.75</div>
@@ -202,8 +202,8 @@ export default function Analytics() {
                           type="monotone"
                           dataKey="transactions"
                           stackId="1"
-                          stroke="hsl(var(--primary))"
-                          fill="hsl(var(--primary))"
+                          stroke="#0ea5e9"
+                          fill="#0ea5e9"
                           fillOpacity={0.6}
                           name="Transactions"
                         />
@@ -211,7 +211,7 @@ export default function Analytics() {
                           yAxisId="right"
                           type="monotone"
                           dataKey="volume"
-                          stroke="hsl(var(--success))"
+                          stroke="#10b981"
                           strokeWidth={2}
                           name="Volume ($)"
                         />
@@ -242,14 +242,14 @@ export default function Analytics() {
                         <Line 
                           type="monotone" 
                           dataKey="issued" 
-                          stroke="hsl(var(--success))" 
+                          stroke="#10b981" 
                           strokeWidth={2}
                           name="Credits Issued"
                         />
                         <Line 
                           type="monotone" 
                           dataKey="retired" 
-                          stroke="hsl(var(--primary))" 
+                          stroke="#f59e0b" 
                           strokeWidth={2}
                           name="Credits Retired"
                         />
@@ -280,7 +280,7 @@ export default function Analytics() {
                         <Line 
                           type="monotone" 
                           dataKey="price" 
-                          stroke="hsl(var(--primary))" 
+                          stroke="#6366f1" 
                           strokeWidth={3}
                           dot={{ r: 6 }}
                           name="Average Price ($)"
@@ -305,8 +305,8 @@ export default function Analytics() {
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        <Bar dataKey="demand" fill="hsl(var(--success))" name="Demand Index" />
-                        <Bar dataKey="supply" fill="hsl(var(--warning))" name="Supply Index" />
+                        <Bar dataKey="demand" fill="#10b981" name="Demand Index" />
+                        <Bar dataKey="supply" fill="#f59e0b" name="Supply Index" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -370,7 +370,7 @@ export default function Analytics() {
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          label={({ name, percent }) => `${name} ${(((percent ?? 0) * 100)).toFixed(0)}%`}
                           outerRadius={80}
                           fill="#8884d8"
                           dataKey="value"
@@ -436,7 +436,7 @@ export default function Analytics() {
                         <XAxis type="number" />
                         <YAxis dataKey="name" type="category" width={100} />
                         <Tooltip />
-                        <Bar dataKey="value" fill="hsl(var(--primary))" />
+                        <Bar dataKey="value" fill="#22d3ee" />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -482,7 +482,7 @@ export default function Analytics() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Button 
                 variant="outline" 
-                className="h-20 flex flex-col space-y-2"
+                className="h-20 flex flex-col space-y-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 border-0"
                 onClick={() => handleGenerateReport('user_growth', '30d')}
               >
                 <Users className="h-5 w-5" />
@@ -490,7 +490,7 @@ export default function Analytics() {
               </Button>
               <Button 
                 variant="outline" 
-                className="h-20 flex flex-col space-y-2"
+                className="h-20 flex flex-col space-y-2 bg-gradient-to-r from-sky-500 to-indigo-500 text-white hover:from-sky-600 hover:to-indigo-600 border-0"
                 onClick={() => handleGenerateReport('market_analysis', '30d')}
               >
                 <TrendingUp className="h-5 w-5" />
@@ -498,7 +498,7 @@ export default function Analytics() {
               </Button>
               <Button 
                 variant="outline" 
-                className="h-20 flex flex-col space-y-2"
+                className="h-20 flex flex-col space-y-2 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white hover:from-violet-600 hover:to-fuchsia-600 border-0"
                 onClick={() => handleGenerateReport('project_performance', '30d')}
               >
                 <Leaf className="h-5 w-5" />
@@ -506,7 +506,7 @@ export default function Analytics() {
               </Button>
               <Button 
                 variant="outline" 
-                className="h-20 flex flex-col space-y-2"
+                className="h-20 flex flex-col space-y-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 border-0"
                 onClick={() => handleGenerateReport('financial_summary', '30d')}
               >
                 <DollarSign className="h-5 w-5" />

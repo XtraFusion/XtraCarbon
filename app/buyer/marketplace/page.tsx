@@ -75,14 +75,14 @@ export default function Marketplace() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Carbon Credit Marketplace</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">Carbon Credit Marketplace</h1>
         <p className="text-muted-foreground mt-2">
           Browse and purchase verified carbon credits from sustainable projects worldwide
         </p>
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="border-none bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/10 dark:to-teal-900/10">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
@@ -124,7 +124,7 @@ export default function Marketplace() {
               </SelectContent>
             </Select>
 
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2 bg-gradient-to-r from-sky-500 to-indigo-500 text-white hover:from-sky-600 hover:to-indigo-600 border-0">
               <Filter className="h-4 w-4" />
               More Filters
             </Button>
@@ -134,7 +134,7 @@ export default function Marketplace() {
 
       {/* Market Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+        <Card className="border-none bg-gradient-to-br from-sky-50 to-indigo-50 dark:from-sky-900/20 dark:to-indigo-900/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-primary/10 rounded-lg">
@@ -148,7 +148,7 @@ export default function Marketplace() {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="border-none bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-success/10 rounded-lg">
@@ -162,7 +162,7 @@ export default function Marketplace() {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="border-none bg-gradient-to-br from-cyan-50 to-sky-50 dark:from-cyan-900/20 dark:to-sky-900/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-info/10 rounded-lg">
@@ -183,7 +183,7 @@ export default function Marketplace() {
           const availabilityPercentage = (credit.availableCredits / credit.totalCredits) * 100;
           
           return (
-            <Card key={credit.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card key={credit.id} className="overflow-hidden hover:shadow-lg transition-shadow border-none">
               <div className="h-40 bg-gradient-card bg-cover bg-center relative">
                 <div className="absolute inset-0 bg-black/20" />
                 <div className="absolute top-4 left-4">
@@ -245,7 +245,7 @@ export default function Marketplace() {
                   <Button 
                     onClick={() => handlePurchase(credit)}
                     disabled={credit.availableCredits === 0}
-                    className="gap-2"
+                    className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
                   >
                     <ShoppingCart className="h-4 w-4" />
                     Buy Credits

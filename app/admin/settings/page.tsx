@@ -157,7 +157,7 @@ export default function Settings() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-foreground">System Settings</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">System Settings</h1>
           <p className="text-muted-foreground">
             Configure system parameters and security settings
           </p>
@@ -165,7 +165,7 @@ export default function Settings() {
 
         {/* Settings Tabs */}
         <Tabs defaultValue="general" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-5 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-sky-500/10">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
@@ -177,8 +177,8 @@ export default function Settings() {
           <TabsContent value="general" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <SettingsIcon className="h-5 w-5" />
+              <CardTitle className="flex items-center space-x-2">
+                  <SettingsIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                   <span>General Configuration</span>
                 </CardTitle>
               </CardHeader>
@@ -255,7 +255,7 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <Button onClick={handleSaveSystemSettings}>
+                <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600" onClick={handleSaveSystemSettings}>
                   <Save className="mr-2 h-4 w-4" />
                   Save General Settings
                 </Button>
@@ -268,7 +268,7 @@ export default function Settings() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Shield className="h-5 w-5" />
+                  <Shield className="h-5 w-5 text-sky-600 dark:text-sky-400" />
                   <span>Security Configuration</span>
                 </CardTitle>
               </CardHeader>
@@ -324,11 +324,11 @@ export default function Settings() {
                 </div>
 
                 <div className="flex space-x-4">
-                  <Button onClick={handleSaveSystemSettings}>
+                  <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600" onClick={handleSaveSystemSettings}>
                     <Save className="mr-2 h-4 w-4" />
                     Save Security Settings
                   </Button>
-                  <Button variant="outline" onClick={() => console.log('Generate security report')}>
+                  <Button variant="outline" className="bg-gradient-to-r from-indigo-500 to-sky-500 text-white hover:from-indigo-600 hover:to-sky-600 border-0" onClick={() => console.log('Generate security report')}>
                     <Shield className="mr-2 h-4 w-4" />
                     Security Report
                   </Button>
@@ -342,7 +342,7 @@ export default function Settings() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Bell className="h-5 w-5" />
+                  <Bell className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                   <span>Notification Settings</span>
                 </CardTitle>
               </CardHeader>
@@ -424,7 +424,7 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <Button onClick={handleSaveSystemSettings}>
+                <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600" onClick={handleSaveSystemSettings}>
                   <Save className="mr-2 h-4 w-4" />
                   Save Notification Settings
                 </Button>
@@ -435,14 +435,14 @@ export default function Settings() {
           {/* Roles & Permissions */}
           <TabsContent value="roles" className="space-y-6">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center space-x-2">
-                  <Users className="h-5 w-5" />
+                  <Users className="h-5 w-5 text-violet-600 dark:text-violet-400" />
                   <span>Roles & Permissions</span>
                 </CardTitle>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button>
+                    <Button className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600">
                       <Plus className="mr-2 h-4 w-4" />
                       Create Role
                     </Button>
@@ -549,9 +549,9 @@ export default function Settings() {
           {/* System */}
           <TabsContent value="system" className="space-y-6">
             <Card>
-              <CardHeader>
+                <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Database className="h-5 w-5" />
+                  <Database className="h-5 w-5 text-sky-600 dark:text-sky-400" />
                   <span>System Maintenance</span>
                 </CardTitle>
               </CardHeader>
@@ -575,7 +575,7 @@ export default function Settings() {
                         <Badge className="bg-success text-success-foreground">Today</Badge>
                       </div>
                     </div>
-                    <Button onClick={handleBackupDatabase} className="w-full">
+                    <Button onClick={handleBackupDatabase} className="w-full bg-gradient-to-r from-indigo-500 to-sky-500 hover:from-indigo-600 hover:to-sky-600">
                       <Database className="mr-2 h-4 w-4" />
                       Create Backup
                     </Button>

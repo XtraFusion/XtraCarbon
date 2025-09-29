@@ -107,7 +107,7 @@ export default function UserManagement() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">User Management</h1>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">User Management</h1>
             <p className="text-muted-foreground">
               Manage user registrations, roles, and permissions
             </p>
@@ -120,17 +120,17 @@ export default function UserManagement() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
+          <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-none shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <Users className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{users.length}</div>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-none shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active</CardTitle>
               <UserCheck className="h-4 w-4 text-success" />
@@ -142,7 +142,7 @@ export default function UserManagement() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border-none shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Pending</CardTitle>
               <UserX className="h-4 w-4 text-warning" />
@@ -154,10 +154,10 @@ export default function UserManagement() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-br from-sky-50 to-indigo-50 dark:from-sky-900/20 dark:to-indigo-900/20 border-none shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Organizations</CardTitle>
-              <Building className="h-4 w-4 text-muted-foreground" />
+              <Building className="h-4 w-4 text-sky-600 dark:text-sky-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -185,7 +185,7 @@ export default function UserManagement() {
               </div>
               
               <Tabs value={statusFilter} onValueChange={(value) => setStatusFilter(value as any)}>
-                <TabsList>
+                <TabsList className="bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-sky-500/10">
                   <TabsTrigger value="all">All</TabsTrigger>
                   <TabsTrigger value="active">Active</TabsTrigger>
                   <TabsTrigger value="pending">Pending</TabsTrigger>
@@ -336,18 +336,18 @@ export default function UserManagement() {
                 <div className="flex space-x-2">
                   {selectedUser.status === 'pending' && (
                     <>
-                      <Button onClick={() => handleApproveUser(selectedUser.id)}>
+                      <Button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600" onClick={() => handleApproveUser(selectedUser.id)}>
                         <UserCheck className="mr-2 h-4 w-4" />
                         Approve User
                       </Button>
-                      <Button variant="destructive" onClick={() => handleRejectUser(selectedUser.id)}>
+                      <Button variant="destructive" className="bg-gradient-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600" onClick={() => handleRejectUser(selectedUser.id)}>
                         <UserX className="mr-2 h-4 w-4" />
                         Reject User
                       </Button>
                     </>
                   )}
                   {selectedUser.status === 'active' && (
-                    <Button variant="destructive" onClick={() => handleSuspendUser(selectedUser.id)}>
+                    <Button variant="destructive" className="bg-gradient-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600" onClick={() => handleSuspendUser(selectedUser.id)}>
                       <UserX className="mr-2 h-4 w-4" />
                       Suspend User
                     </Button>

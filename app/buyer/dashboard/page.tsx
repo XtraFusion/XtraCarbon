@@ -22,18 +22,18 @@ export default function BuyerDashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="bg-gradient-primary text-primary-foreground rounded-lg p-6">
+      <div className="rounded-lg p-6 bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">
               Welcome back, {mockUser.firstName}!
             </h1>
-            <p className="text-primary-foreground/80 text-lg">
+            <p className="text-white/90 text-lg">
               {mockUser.organizationName}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-primary-foreground/80">Member since</p>
+            <p className="text-sm text-white/80">Member since</p>
             <p className="font-semibold">
               {new Date(mockUser.createdAt).toLocaleDateString('en-US', {
                 month: 'long',
@@ -47,9 +47,9 @@ export default function BuyerDashboard() {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Link href="/buyer/marketplace">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-none">
             <CardContent className="p-6 text-center">
-              <ShoppingCart className="h-10 w-10 text-primary mx-auto mb-3" />
+              <ShoppingCart className="h-10 w-10 text-emerald-600 dark:text-emerald-400 mx-auto mb-3" />
               <h3 className="font-semibold mb-1">Buy Credits</h3>
               <p className="text-sm text-muted-foreground">Browse marketplace</p>
             </CardContent>
@@ -57,7 +57,7 @@ export default function BuyerDashboard() {
         </Link>
         
         <Link href="/buyer/portfolio">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-none">
             <CardContent className="p-6 text-center">
               <Leaf className="h-10 w-10 text-success mx-auto mb-3" />
               <h3 className="font-semibold mb-1">Retire Credits</h3>
@@ -67,7 +67,7 @@ export default function BuyerDashboard() {
         </Link>
         
         <Link href="/buyer/transactions">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer bg-gradient-to-br from-sky-50 to-indigo-50 dark:from-sky-900/20 dark:to-indigo-900/20 border-none">
             <CardContent className="p-6 text-center">
               <Award className="h-10 w-10 text-info mx-auto mb-3" />
               <h3 className="font-semibold mb-1">Certificates</h3>
@@ -79,10 +79,10 @@ export default function BuyerDashboard() {
 
       {/* Portfolio Summary */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card>
+        <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Portfolio Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -94,10 +94,10 @@ export default function BuyerDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Credits Owned</CardTitle>
-            <Leaf className="h-4 w-4 text-muted-foreground" />
+            <Leaf className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -109,10 +109,10 @@ export default function BuyerDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-br from-sky-50 to-indigo-50 dark:from-sky-900/20 dark:to-indigo-900/20 border-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">CO₂ Offset</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <TrendingUp className="h-4 w-4 text-sky-600 dark:text-sky-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">

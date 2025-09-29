@@ -62,7 +62,7 @@ export default function Portfolio() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">My Portfolio</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">My Portfolio</h1>
         <p className="text-muted-foreground mt-2">
           Manage your carbon credits and track your environmental impact
         </p>
@@ -70,10 +70,10 @@ export default function Portfolio() {
 
       {/* Portfolio Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="border-none bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Owned</CardTitle>
-            <Leaf className="h-4 w-4 text-muted-foreground" />
+            <Leaf className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -85,10 +85,10 @@ export default function Portfolio() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-none bg-gradient-to-br from-sky-50 to-indigo-50 dark:from-sky-900/20 dark:to-indigo-900/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Current Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-4 w-4 text-sky-600 dark:text-sky-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -100,7 +100,7 @@ export default function Portfolio() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-none bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Gain/Loss</CardTitle>
             {totalGainLoss >= 0 ? (
@@ -121,10 +121,10 @@ export default function Portfolio() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-none bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-900/20 dark:to-fuchsia-900/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Retired</CardTitle>
-            <Award className="h-4 w-4 text-muted-foreground" />
+            <Award className="h-4 w-4 text-violet-600 dark:text-violet-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -139,7 +139,7 @@ export default function Portfolio() {
 
       {/* Portfolio Details */}
       <Tabs defaultValue="owned" className="space-y-4">
-        <TabsList>
+        <TabsList className="bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-sky-500/10">
           <TabsTrigger value="owned">Owned Credits ({ownedCredits.length})</TabsTrigger>
           <TabsTrigger value="retired">Retired Credits ({retiredCredits.length})</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>

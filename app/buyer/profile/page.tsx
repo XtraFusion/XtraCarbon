@@ -69,14 +69,14 @@ export default function Profile() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">My Profile</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">My Profile</h1>
         <p className="text-muted-foreground mt-2">
           Manage your account settings and preferences
         </p>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-4 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-sky-500/10">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>

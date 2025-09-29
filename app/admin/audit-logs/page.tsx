@@ -131,7 +131,7 @@ export default function AuditLogs() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Audit Logs</h1>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent">Audit Logs</h1>
             <p className="text-muted-foreground">
               Track all system activities and user actions
             </p>
@@ -144,10 +144,10 @@ export default function AuditLogs() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
+          <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-none shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Logs</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
+              <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{logs.length.toLocaleString()}</div>
@@ -157,7 +157,7 @@ export default function AuditLogs() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-br from-rose-50 to-orange-50 dark:from-rose-900/20 dark:to-orange-900/20 border-none shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Admin Actions</CardTitle>
               <Shield className="h-4 w-4 text-red-500" />
@@ -172,7 +172,7 @@ export default function AuditLogs() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border-none shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Failed Actions</CardTitle>
               <XCircle className="h-4 w-4 text-destructive" />
@@ -187,7 +187,7 @@ export default function AuditLogs() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border-none shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
               <CheckCircle className="h-4 w-4 text-success" />
