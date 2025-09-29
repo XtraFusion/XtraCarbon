@@ -7,9 +7,8 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import AppShell from "../components/app-shell";
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.app",
+  title: "XtraCarbon",
+  description: "Created with XtraFusion",
 };
 
 export default function RootLayout({
