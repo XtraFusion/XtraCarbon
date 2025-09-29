@@ -32,7 +32,7 @@ interface BuyerLayoutProps {
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/buyer', icon: Home },
+  { name: 'Dashboard', href: '/buyer/dashboard', icon: Home },
   { name: 'Marketplace', href: '/buyer/marketplace', icon: ShoppingCart },
   { name: 'Portfolio', href: '/buyer/portfolio', icon: Briefcase },
   { name: 'Transactions', href: '/buyer/transactions', icon: History },

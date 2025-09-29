@@ -20,10 +20,11 @@ import Link from 'next/link';
 const sidebarItems = [
   {
     title: 'Dashboard',
-    href: '/admin',
+    href: '/admin/dashboard',
     icon: Home,
     exact: true
   },
+  
   {
     title: 'User Management',
     href: '/admin/users',
